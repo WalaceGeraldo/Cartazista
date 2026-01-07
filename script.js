@@ -14,9 +14,284 @@ const elements = {
     appContainer: document.querySelector('.app-container')
 };
 
+// Resizing State
+let activeResizeElement = null; // The element being resized
+let resizeHandleType = null; // 'e', 's', 'se'
+let resizeStartX = 0;
+let resizeStartY = 0;
+let initialScaleX = 1;
+let initialScaleY = 1;
+let initialWidth = 0;
+let initialHeight = 0;
+// Rotation State
+let initialRotation = 0;
+let rotationCenterX = 0;
+let rotationCenterY = 0;
+let startMouseAngle = 0;
+
+// Selection State
+let selectedElement = null;
+
+// --- Interactive Resizing Logic ---
+
+// Deselect when clicking empty space
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('.draggable') && !e.target.closest('.resize-handle')) {
+        deselectElement();
+    }
+});
+
+function deselectElement() {
+    if (selectedElement) {
+        selectedElement.classList.remove('selected-element');
+        // Remove handles
+        const handles = selectedElement.querySelectorAll('.resize-handle');
+        handles.forEach(h => h.remove());
+        selectedElement = null;
+    }
+}
+
+function selectElement(element) {
+    if (selectedElement === element) return; // Already selected
+    deselectElement();
+
+    selectedElement = element;
+    selectedElement.classList.add('selected-element');
+
+    // Create Handles
+    const handleE = createHandle('e');
+    const handleS = createHandle('s');
+    const handleSE = createHandle('se');
+    const handleRot = createHandle('rot'); // Added
+
+    selectedElement.appendChild(handleE);
+    selectedElement.appendChild(handleS);
+    selectedElement.appendChild(handleSE);
+    selectedElement.appendChild(handleRot); // Added
+}
+
+function createHandle(type) {
+    const handle = document.createElement('div');
+    handle.className = `resize-handle handle-${type}`;
+    handle.dataset.type = type;
+
+    // Mouse events
+    if (type === 'rot') {
+        handle.addEventListener('mousedown', initRotate);
+        handle.addEventListener('touchstart', initRotate, { passive: false });
+    } else {
+        handle.addEventListener('mousedown', initResize);
+        handle.addEventListener('touchstart', initResize, { passive: false });
+    }
+
+    return handle;
+}
+
+function initResize(e) {
+    e.stopPropagation(); // Stop drag or selection
+    e.preventDefault(); // Prevent text selection/scroll
+
+    activeResizeElement = selectedElement;
+    resizeHandleType = e.target.dataset.type;
+
+    // Calculate current scale of the container to adjust mouse movement (Copied from dragStart)
+    const container = document.getElementById('printContainer');
+    // We try to parse the inline style first as it's most accurate from mobile_scale.js
+    const transform = container.style.transform;
+    const match = transform && transform.match(/scale\(([^)]+)\)/);
+    if (match) {
+        currentScale = parseFloat(match[1]);
+    } else {
+        // Fallback to computed style (matrix)
+        const style = window.getComputedStyle(container);
+        const matrix = style.transform; // matrix(a, b, c, d, tx, ty)
+        if (matrix && matrix !== 'none') {
+            const values = matrix.split('(')[1].split(')')[0].split(',');
+            currentScale = parseFloat(values[0]); // a = scaleX
+        } else {
+            currentScale = 1;
+        }
+    }
+    if (!currentScale || currentScale <= 0) currentScale = 1;
+
+    let clientX, clientY;
+    if (e.type === 'touchstart') {
+        clientX = e.touches[0].clientX;
+        clientY = e.touches[0].clientY;
+    } else {
+        clientX = e.clientX;
+        clientY = e.clientY;
+    }
+
+    resizeStartX = clientX;
+    resizeStartY = clientY;
+
+    // Get current scale (parse transform)
+    const style = window.getComputedStyle(activeResizeElement);
+    const matrix = new DOMMatrix(style.transform);
+    initialScaleX = matrix.a; // scale X
+    initialScaleY = matrix.d; // scale Y
+
+    initialWidth = activeResizeElement.offsetWidth;
+    initialHeight = activeResizeElement.offsetHeight;
+
+    if (e.type === 'touchstart') {
+        document.addEventListener('touchmove', doResize, { passive: false });
+        document.addEventListener('touchend', stopResize);
+    } else {
+        document.addEventListener('mousemove', doResize);
+        document.addEventListener('mouseup', stopResize);
+    }
+}
+
+function doResize(e) {
+    if (!activeResizeElement) return;
+    e.preventDefault();
+    e.stopPropagation();
+
+    let clientX, clientY;
+    if (e.type === 'touchmove') {
+        clientX = e.touches[0].clientX;
+        clientY = e.touches[0].clientY;
+    } else {
+        clientX = e.clientX;
+        clientY = e.clientY;
+    }
+
+    // Delta adjusted by global zoom/scale if needed. 
+    // Assuming container scale is handled by DOMMatrix or we need to divide by currentScale like drag.
+
+    const dx = (clientX - resizeStartX) / currentScale;
+    const dy = (clientY - resizeStartY) / currentScale;
+
+    // Get current rotation to preserve it
+    const style = window.getComputedStyle(activeResizeElement);
+    const matrix = new DOMMatrix(style.transform);
+    // Extract angle from matrix (a,b)
+    // angle = atan2(b, a)
+    let currentAngle = Math.atan2(matrix.b, matrix.a) * (180 / Math.PI);
+
+    let newScaleX = initialScaleX;
+    let newScaleY = initialScaleY;
+
+    // Calculate new scale based on dimension change
+    // Using simple ratio: (originalWidth + dx) / originalWidth * originalScale
+
+    if (resizeHandleType === 'e' || resizeHandleType === 'se') {
+        // Horizontal Stretch
+        const newWidth = initialWidth + dx;
+        if (newWidth > 20) { // Min width
+            // ratio * oldScale
+            newScaleX = (newWidth / initialWidth) * initialScaleX;
+        }
+    }
+
+    if (resizeHandleType === 's' || resizeHandleType === 'se') {
+        // Vertical Stretch
+        const newHeight = initialHeight + dy;
+        if (newHeight > 10) { // Min height
+            newScaleY = (newHeight / initialHeight) * initialScaleY;
+        }
+    }
+
+    activeResizeElement.style.transform = `rotate(${currentAngle}deg) scale(${newScaleX}, ${newScaleY})`;
+}
+
+// --- Rotation Logic ---
+
+function initRotate(e) {
+    e.stopPropagation();
+    e.preventDefault();
+
+    activeResizeElement = selectedElement;
+
+    // Calculate Center
+    const rect = activeResizeElement.getBoundingClientRect();
+    rotationCenterX = rect.left + rect.width / 2;
+    rotationCenterY = rect.top + rect.height / 2;
+
+    let clientX, clientY;
+    if (e.type === 'touchstart') {
+        clientX = e.touches[0].clientX;
+        clientY = e.touches[0].clientY;
+    } else {
+        clientX = e.clientX;
+        clientY = e.clientY;
+    }
+
+    // Start Angle relative to center
+    startMouseAngle = Math.atan2(clientY - rotationCenterY, clientX - rotationCenterX);
+
+    // Initial Rotation from CSS
+    const style = window.getComputedStyle(activeResizeElement);
+    const matrix = new DOMMatrix(style.transform);
+    // angle in radians for calculation? No, let's store deg
+    initialRotation = Math.atan2(matrix.b, matrix.a); // Radians
+
+    if (e.type === 'touchstart') {
+        document.addEventListener('touchmove', doRotate, { passive: false });
+        document.addEventListener('touchend', stopRotate);
+    } else {
+        document.addEventListener('mousemove', doRotate);
+        document.addEventListener('mouseup', stopRotate);
+    }
+}
+
+function doRotate(e) {
+    if (!activeResizeElement) return;
+    e.preventDefault();
+    e.stopPropagation();
+
+    let clientX, clientY;
+    if (e.type === 'touchmove') {
+        clientX = e.touches[0].clientX;
+        clientY = e.touches[0].clientY;
+    } else {
+        clientX = e.clientX;
+        clientY = e.clientY;
+    }
+
+    const currentMouseAngle = Math.atan2(clientY - rotationCenterY, clientX - rotationCenterX);
+    const deltaAngle = currentMouseAngle - startMouseAngle;
+
+    const newRotationRad = initialRotation + deltaAngle;
+    const newRotationDeg = newRotationRad * (180 / Math.PI);
+
+    // Preserve Scale
+    const style = window.getComputedStyle(activeResizeElement);
+    const matrix = new DOMMatrix(style.transform);
+    // Extract scale. Math.hypot(a,b) = scaleX (if no skew)
+    const currentScaleX = Math.hypot(matrix.a, matrix.b);
+    const currentScaleY = Math.hypot(matrix.c, matrix.d);
+
+    // We already have 'initialScaleX' variables but they are for resize... 
+    // Let's trust the matrix for current scale fidelity during rotation.
+    // Actually, 'initResize' sets initialScaleX, initRotate does not.
+    // So we should just use the computed values or keep state.
+    // Simpler: Just extract from matrix now.
+
+    activeResizeElement.style.transform = `rotate(${newRotationDeg}deg) scale(${currentScaleX}, ${currentScaleY})`;
+}
+
+function stopRotate(e) {
+    activeResizeElement = null;
+    document.removeEventListener('mousemove', doRotate);
+    document.removeEventListener('mouseup', stopRotate);
+    document.removeEventListener('touchmove', doRotate);
+    document.removeEventListener('touchend', stopRotate);
+}
+
+function stopResize(e) {
+    activeResizeElement = null;
+    document.removeEventListener('mousemove', doResize);
+    document.removeEventListener('mouseup', stopResize);
+    document.removeEventListener('touchmove', doResize);
+    document.removeEventListener('touchend', stopResize);
+}
+
 // Global Configuration
 let config = {
-    theme: "white",
+    theme: "vector", // Changed from "white" to "vector"
     paper: "A4",
     orientation: "portrait",
     layout: 1
@@ -311,10 +586,26 @@ function createPosterCard(data, index) {
         cardsState[index].price = e.target.innerText;
     });
 
+    // Added: Click to Select for Resizing
+    // Added: Click to Select for Resizing
+    // UPDATED: Now clicking price selects the whole Container to resize R$ + Value + Unit together
     const unitVal = document.createElement('span');
     unitVal.className = 'unit-value';
     unitVal.style.fontSize = "0.4em";
     unitVal.innerText = data.unit ? ` /${data.unit}` : '';
+
+    // Added: Click to Select for Resizing
+    // UPDATED: Now clicking price selects the whole Container to resize R$ + Value + Unit together
+    const selectContainer = (e) => {
+        e.stopPropagation();
+        if (!activeResizeElement) {
+            selectElement(priceContainer);
+        }
+    };
+
+    priceVal.addEventListener('click', selectContainer);
+    currency.addEventListener('click', selectContainer);
+    unitVal.addEventListener('click', selectContainer);
 
     priceContainer.appendChild(currency);
     priceContainer.appendChild(priceVal);
@@ -348,13 +639,24 @@ function setupInteraction(element, dataIndex, dataField) {
     // 2. Editing (Double Click)
     element.contentEditable = false; // Start forbidden
 
+    // Selection (Click)
+    element.addEventListener('click', (e) => {
+        // e.stopPropagation(); // Let it bubble to allow deselect? No, click on item selects it.
+        e.stopPropagation();
+        if (!activeResizeElement) { // Don't select if currently resizing
+            selectElement(element);
+        }
+    });
+
     element.addEventListener('dblclick', (e) => {
-        e.stopPropagation(); // prevent triggering drag start if bubbles
+        e.stopPropagation();
         element.contentEditable = true;
         element.focus();
         element.classList.add('editing');
+        // Edit mode implies selection too, mostly.
+        selectElement(element);
         // Optional: select all text
-        // document.execCommand('selectAll', false, null); 
+        // document.execCommand('selectAll', false, null);
     });
 
     element.addEventListener('blur', () => {
@@ -411,6 +713,11 @@ function dragStart(e) {
     if (target.isContentEditable) return;
 
     activeDragElement = target;
+
+    // Added: Select instantly on interaction (fixes issue where click was blocked)
+    if (activeDragElement !== selectedElement) {
+        selectElement(activeDragElement);
+    }
 
     // Calculate current scale of the container to adjust mouse movement
     const container = document.getElementById('printContainer');
