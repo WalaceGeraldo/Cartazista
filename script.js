@@ -955,15 +955,42 @@ function checkSession() {
 
         // Redirect based on role
         if (user.role === 'admin' || user.email === 'admin@admin.com') {
+            const backBtn = document.getElementById('backToDashBtn');
+            if (backBtn) backBtn.classList.remove('hidden'); // Show for admin
+
             showView('dashboard');
-            renderDashboard(); // Load stats and table
+            renderDashboard();
         } else {
+            const backBtn = document.getElementById('backToDashBtn');
+            if (backBtn) backBtn.classList.add('hidden'); // Hide for user
+
             // Regular user -> Redirect to App immediately
             showView('app');
         }
     } else {
         showView('login');
     }
+}
+
+// ... (Listeners)
+function initListeners() { // Wrapped to avoid duplicates/errors
+    if (document.getElementById('loginBtn')) {
+        document.getElementById('loginBtn').addEventListener('click', login);
+    }
+
+    // ... other listeners ...
+}
+
+if (document.getElementById('appLogoutBtn')) {
+    document.getElementById('appLogoutBtn').addEventListener('click', logout);
+}
+
+// Fix: Add listener for Back Button
+if (document.getElementById('backToDashBtn')) {
+    document.getElementById('backToDashBtn').addEventListener('click', () => {
+        showView('dashboard');
+        renderDashboard();
+    });
 }
 
 function login() {

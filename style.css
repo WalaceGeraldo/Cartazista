@@ -834,6 +834,9 @@ input[type="number"] {
     color: white;
     display: flex;
     flex-direction: column;
+    overflow-y: auto;
+    /* Allow native scrolling */
+    height: 100vh;
 }
 
 .dash-header {
@@ -1146,4 +1149,49 @@ input[type="number"] {
 .secondary-btn:hover {
     background: #333;
     color: white;
+}
+
+/* FIX MOBILE EDITOR SCROLLING (ROBUST V2) */
+@media (max-width: 768px) {
+
+    /* 1. Unlock the body/html */
+    html,
+    body {
+        overflow: auto !important;
+        height: auto !important;
+    }
+
+    /* 2. Unlock the View container */
+    #appView {
+        height: auto !important;
+        /* Let content dictate height */
+        min-height: 100vh;
+        overflow: visible !important;
+        display: block !important;
+        padding-bottom: 80px;
+        /* Space for scrolling */
+    }
+
+    /* 3. Unlock internal containers */
+    .app-container {
+        height: auto !important;
+        overflow: visible !important;
+        display: block !important;
+    }
+
+    .preview-area {
+        height: auto !important;
+        overflow: visible !important;
+        padding-bottom: 50px;
+    }
+
+    /* 4. Keep Navbar accessible */
+    .app-navbar {
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        background: #2a2a2a;
+        /* Ensure it's opaque */
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
 }
