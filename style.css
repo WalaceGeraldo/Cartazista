@@ -154,6 +154,18 @@ select {
 .sidebar-toggle {
     display: none;
     /* Hidden by default (Desktop) */
+    /* Base styles for when it is shown (Mobile) */
+    position: fixed;
+    /* Fixed to viewport */
+    background: var(--accent-color);
+    color: white;
+    border: none;
+    cursor: pointer;
+    z-index: 100;
+    /* Above sidebar */
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
 }
 
 /* Custom Scrollbar */
@@ -453,27 +465,34 @@ input[type="number"] {
 
     .sidebar {
         width: 100%;
-        height: auto;
+        height: 100vh;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 999;
+        /* Overlay content */
         border-right: none;
         border-bottom: 1px solid var(--border-color);
-        padding: 15px;
+        padding: 20px;
+        background-color: var(--sidebar-bg);
+        overflow-y: auto;
+        /* Allow menu scrolling */
     }
 
     /* Mobile Toggle Button */
     .sidebar-toggle {
         display: flex;
         /* Show on mobile */
-        left: auto;
-        right: 10px;
-        top: 10px;
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        /* Circle looks better on mobile */
+        right: 0;
+        top: 0;
+        width: 48px;
+        height: 48px;
+        border-radius: 0 0 0 12px;
+        /* Docked corner look */
         transform: none;
         position: fixed;
-        /* Keep it visible even if scrolled */
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        box-shadow: -2px 2px 5px rgba(0, 0, 0, 0.3);
+        z-index: 1000;
     }
 
     /* Mobile Collapsed State */
@@ -485,14 +504,11 @@ input[type="number"] {
 
     .app-container.collapsed .sidebar-toggle {
         left: auto;
-        right: 10px;
-        /* Stay put */
+        right: 0;
+        /* Stay docked */
     }
 
-    .app-container.collapsed .sidebar-toggle::before {
-        content: "⚙️";
-        /* Gear icon to indicate "Show Settings" */
-    }
+    /* Removed gear icon override to keep arrows */
 
     /* When expanded on mobile, show close or arrow down? */
     /* JS sets InnerText. We might need to override it or use icons entirely. 
