@@ -884,3 +884,215 @@ async function downloadPDF() {
 }
 
 init();
+
+// --- AUTHENTICATION & USER MANAGEMENT ---
+
+// Default Admin User
+const DEFAULT_ADMIN = {
+    id: 1,
+    name: 'Administrador',
+    email: 'admin@admin.com',
+    pass: 'admin',
+    role: 'admin'
+};
+
+// Functions to interact with User Database (LocalStorage)
+function getUsers() {
+    const stored = localStorage.getItem('cartazista_users');
+    if (!stored) {
+        // Initialize with default admin
+        const initial = [DEFAULT_ADMIN];
+        localStorage.setItem('cartazista_users', JSON.stringify(initial));
+        return initial;
+    }
+    return JSON.parse(stored);
+}
+
+function saveUser(name, email, pass) {
+    const users = getUsers();
+    // Simple validation
+    if (!name || !email || !pass) return false;
+    if (users.find(u => u.email === email)) {
+        alert('Este e-mail já está cadastrado!');
+        return false;
+    }
+
+    const newUser = {
+        id: Date.now(),
+        name: name,
+        email: email,
+        pass: pass,
+        role: 'user'
+    };
+
+    users.push(newUser);
+    localStorage.setItem('cartazista_users', JSON.stringify(users));
+    return true;
+}
+
+function deleteUser(id) {
+    let users = getUsers();
+    // Prevent deleting the last admin
+    const userToDelete = users.find(u => u.id === id);
+    if (userToDelete && userToDelete.email === 'admin@admin.com') {
+        alert('Não é possível remover o super-admin!');
+        return;
+    }
+
+    if (confirm('Tem certeza que deseja remover este usuário?')) {
+        users = users.filter(u => u.id !== id);
+        localStorage.setItem('cartazista_users', JSON.stringify(users));
+        renderDashboard(); // Refresh
+    }
+}
+
+function checkSession() {
+    const session = localStorage.getItem('cartazista_session');
+    if (session) {
+        // Logged in
+        const user = JSON.parse(session);
+        document.getElementById('currentUserDisplay').innerText = user.name || 'Usuário';
+
+        // Redirect based on role
+        if (user.role === 'admin' || user.email === 'admin@admin.com') {
+            showView('dashboard');
+            renderDashboard(); // Load stats and table
+        } else {
+            // Regular user -> Redirect to App immediately
+            showView('app');
+        }
+    } else {
+        showView('login');
+    }
+}
+
+function login() {
+    const email = document.getElementById('emailInput').value;
+    const password = document.getElementById('passwordInput').value;
+    const users = getUsers();
+
+    const foundUser = users.find(u => u.email === email && u.pass === password);
+
+    if (foundUser) {
+        // Save full user object to session
+        localStorage.setItem('cartazista_session', JSON.stringify(foundUser));
+        checkSession();
+    } else {
+        alert('E-mail ou senha incorretos!');
+    }
+}
+
+function logout() {
+    localStorage.removeItem('cartazista_session');
+    showView('login');
+    document.getElementById('emailInput').value = "";
+    document.getElementById('passwordInput').value = "";
+}
+
+// --- DASHBOARD RENDERING ---
+function renderDashboard() {
+    const users = getUsers();
+
+    // Update Stats
+    document.getElementById('statsUserCount').innerText = users.length;
+
+    // Update Table
+    const tbody = document.getElementById('userTableBody');
+    tbody.innerHTML = ''; // Clear
+
+    users.forEach(user => {
+        const tr = document.createElement('tr');
+        const isMe = user.email === JSON.parse(localStorage.getItem('cartazista_session') || '{}').email;
+
+        tr.innerHTML = `
+            <td>
+                <strong>${user.name}</strong> 
+                ${isMe ? '<span style="color:#f1c40f; font-size:0.8em; margin-left:5px;">(Você)</span>' : ''}
+            </td>
+            <td>${user.email}</td>
+            <td style="text-align:right;">
+                ${user.role !== 'admin' || user.email !== 'admin@admin.com' ?
+                `<button class="delete-btn" onclick="deleteUser(${user.id})">Excluir</button>` :
+                '<span style="color:#666; font-size:0.8rem;">Bloqueado</span>'}
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+// --- MODAL LOGIC ---
+const modal = document.getElementById('addUserModal');
+const btnShowAdd = document.getElementById('showAddUserBtn');
+const btnCancelAdd = document.getElementById('cancelAddUserBtn');
+const btnConfirmAdd = document.getElementById('confirmAddUserBtn'); // Fixed ID
+
+if (btnShowAdd) {
+    btnShowAdd.addEventListener('click', () => {
+        // Clear inputs
+        document.getElementById('newUserName').value = '';
+        document.getElementById('newUserEmail').value = '';
+        document.getElementById('newUserPass').value = '';
+        modal.classList.remove('hidden');
+    });
+}
+
+if (btnCancelAdd) {
+    btnCancelAdd.addEventListener('click', () => {
+        modal.classList.add('hidden');
+    });
+}
+
+if (btnConfirmAdd) {
+    btnConfirmAdd.addEventListener('click', () => {
+        const name = document.getElementById('newUserName').value;
+        const email = document.getElementById('newUserEmail').value;
+        const pass = document.getElementById('newUserPass').value;
+
+        if (saveUser(name, email, pass)) {
+            modal.classList.add('hidden');
+            renderDashboard(); // Refresh list
+            alert('Usuário criado com sucesso!');
+        }
+    });
+
+    // Make functions global so inline onclicks work
+    window.deleteUser = deleteUser;
+}
+
+function showView(viewName) {
+    document.querySelectorAll('.view').forEach(el => el.classList.add('hidden'));
+
+    if (viewName === 'login') {
+        document.getElementById('loginView').classList.remove('hidden');
+    } else if (viewName === 'dashboard') {
+        document.getElementById('dashboardView').classList.remove('hidden');
+    } else if (viewName === 'app') {
+        document.getElementById('appView').classList.remove('hidden');
+        window.dispatchEvent(new Event('resize'));
+    }
+}
+
+// --- LISTENERS ---
+if (document.getElementById('loginBtn')) {
+    document.getElementById('loginBtn').addEventListener('click', login);
+    document.getElementById('passwordInput').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') login();
+    });
+}
+
+if (document.getElementById('logoutBtn')) {
+    document.getElementById('logoutBtn').addEventListener('click', logout);
+}
+
+if (document.getElementById('createPosterBtn')) {
+    document.getElementById('createPosterBtn').addEventListener('click', () => {
+        showView('app');
+    });
+}
+
+// Updated: Editor Logout Button
+if (document.getElementById('appLogoutBtn')) {
+    document.getElementById('appLogoutBtn').addEventListener('click', logout);
+}
+
+setTimeout(checkSession, 100);

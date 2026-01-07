@@ -14,188 +14,293 @@
 
 <body>
 
-    <div class="app-container">
-        <!-- Sidebar Controls -->
-        <aside class="sidebar" id="sidebar">
-            <div class="logo">
-                <h1>Cartazista</h1>
+    <!-- LOGIN VIEW -->
+    <div id="loginView" class="view">
+        <div class="login-card">
+            <div class="login-header">
+                <h2>Cartazista</h2>
+                <p>Acesso Administrativo</p>
             </div>
-            <!-- ... (rest of sidebar content) ... -->
+            <div class="login-form">
+                <input type="email" id="emailInput" placeholder="E-mail" value="admin@admin.com">
+                <input type="password" id="passwordInput" placeholder="Senha" value="">
+                <button id="loginBtn">ENTRAR 🔒</button>
+            </div>
+        </div>
+    </div>
 
-
-            <div class="control-group">
-                <h3>Produto</h3>
-                <label>
-                    <span>Texto de Destaque</span>
-                    <input type="text" id="offerText" placeholder="Ex: OFERTA" value="OFERTA">
-                </label>
-                <label>
-                    <span>Nome do Produto</span>
-                    <input type="text" id="productName" placeholder="Ex: Banana Prata" value="BANANA PRATA">
-                </label>
-                <label>
-                    <span>Categoria (Opcional)</span>
-                    <input type="text" id="productCategory" value="" placeholder="Ex: Frutas">
-                </label>
-                <label>
-                    <span>Detalhe (Opcional)</span>
-                    <input type="text" id="productDetail" placeholder="Ex: Graúda" value="GRAUDA">
-                </label>
-                <div class="price-row">
-                    <label>
-                        <span>Preço (R$)</span>
-                        <input type="text" id="productPrice" placeholder="0,00" value="88,88">
-                    </label>
-                    <label>
-                        <span>Unidade</span>
-                        <select id="productUnit">
-                            <option value="">Nenhuma</option>
-                            <option value="Kg">Kg</option>
-                            <option value="Un">Un</option>
-                            <option value="100g">100g</option>
-                        </select>
-                    </label>
-                </div>
+    <!-- DASHBOARD VIEW -->
+    <div id="dashboardView" class="view hidden">
+        <header class="dash-header">
+            <div class="dash-logo">Cartazista <span>Admin</span></div>
+            <button id="logoutBtn" class="logout-btn">Sair 🚪</button>
+        </header>
+        <main class="dash-content">
+            <div class="dash-welcome">
+                <h1>Painel Administrativo</h1>
+                <p>Bem-vindo, <span id="currentUserDisplay">Admin</span></p>
             </div>
 
-            <div class="control-group" id="paramsGroup">
-                <!-- Font Sizes -->
-                <h3>Tamanho da Fonte</h3>
-                <div class="price-row">
-                    <label style="flex:1">
-                        <span>Oferta</span>
-                        <input type="number" id="fsOffer" step="0.5" value="">
-                    </label>
-                    <label style="flex:1">
-                        <span>Produto</span>
-                        <input type="number" id="fsName" step="0.5" value="">
-                    </label>
+            <!-- Stats Row -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">👥</div>
+                    <div class="stat-info">
+                        <h3>Usuários</h3>
+                        <div class="stat-value" id="statsUserCount">1</div>
+                    </div>
                 </div>
-                <div class="price-row">
-                    <label style="flex:1">
-                        <span>Categ.</span>
-                        <input type="number" id="fsCategory" step="0.5" value="">
-                    </label>
-                    <label style="flex:1">
-                        <span>Detalhe</span>
-                        <input type="number" id="fsDetail" step="0.5" value="">
-                    </label>
-                </div>
-                <div class="price-row">
-                    <label style="flex:1">
-                        <span>Preço</span>
-                        <input type="number" id="fsPrice" step="0.5" value="">
-                    </label>
-                </div>
-
-                <!-- Vertical Scaling (Stretching) -->
-                <h3>Alongamento Vertical</h3>
-                <div class="price-row">
-                    <label style="flex:1">
-                        <span>Oferta</span>
-                        <input type="number" id="scaleOffer" step="0.1" value="1.0">
-                    </label>
-                    <label style="flex:1">
-                        <span>Produto</span>
-                        <input type="number" id="scaleName" step="0.1" value="1.0">
-                    </label>
-                </div>
-                <div class="price-row">
-                    <label style="flex:1">
-                        <span>Categ.</span>
-                        <input type="number" id="scaleCategory" step="0.1" value="1.0">
-                    </label>
-                    <label style="flex:1">
-                        <span>Detalhe</span>
-                        <input type="number" id="scaleDetail" step="0.1" value="1.0">
-                    </label>
-                </div>
-                <div class="price-row">
-                    <label style="flex:1">
-                        <span>Preço</span>
-                        <input type="number" id="scalePrice" step="0.1" value="1.0">
-                    </label>
-                </div>
-
-                <button id="resetFonts"
-                    style="width:100%; margin-top:10px; padding:5px; background:#444; border:none; color:#ccc; cursor:pointer; border-radius:4px;">Restaurar
-                    Padrão</button>
-            </div>
-
-            <div class="control-group">
-                <h3>Visual</h3>
-                <label>
-                    <span>Tema (Fundo)</span>
-                    <select id="backgroundTheme">
-                        <option value="white">Branco (Padrão)</option>
-                        <option value="yellow">Amarelo</option>
-                        <option value="vector" selected>Vetor (Amarelo Principal)</option>
-                    </select>
-                </label>
-            </div>
-
-            <div class="control-group">
-                <h3>Layout de Impressão</h3>
-                <label>
-                    <span>Tamanho do Papel</span>
-                    <select id="paperSize">
-                        <option value="A4">A4 (21 x 29.7 cm)</option>
-                        <option value="A3">A3 (29.7 x 42 cm)</option>
-                        <option value="A5">A5 (14.8 x 21 cm)</option>
-                        <option value="Letter">Carta (21.6 x 27.9 cm)</option>
-                        <option value="Legal">Ofício (21.6 x 35.6 cm)</option>
-                    </select>
-                </label>
-                <label>
-                    <span>Formato da Página</span>
-                    <select id="orientation">
-                        <option value="portrait">Retrato (Vertical)</option>
-                        <option value="landscape">Paisagem (Horizontal)</option>
-                    </select>
-                </label>
-                <label>
-                    <span>Cartazes por Folha</span>
-                    <select id="gridLayout">
-                        <option value="1">1 (Tela Cheia)</option>
-                        <option value="2">2 Cartazes</option>
-                        <option value="4">4 Cartazes</option>
-                        <option value="8">8 Cartazes</option>
-                    </select>
-                </label>
-                <div class="action-buttons">
-                    <button onclick="downloadPDF()" class="pdf-btn" id="btnDownloadPdf">
-                        BAIXAR PDF 📥
-                    </button>
-                    <button onclick="window.print()" class="print-btn">
-                        IMPRIMIR 🖨️
-                    </button>
-                </div>
-            </div>
-            <!-- Duplicate button removed -->
-        </aside>
-
-        <!-- Toggle Button -->
-        <button id="sidebarToggle" class="sidebar-toggle" title="Ocultar/Mostrar Menu">◀</button>
-
-        <!-- Preview Area -->
-        <main class="preview-area">
-            <div id="printContainer" class="print-container paper-a4 portrait layout-1">
-                <!-- Poster Template (Repeated via JS) -->
-                <div class="poster-card">
-                    <div class="vector-bg"></div>
-                    <div class="content">
-                        <div class="offer-label">OFERTA</div>
-                        <div class="product-name" contenteditable="true">BANANA PRATA</div>
-                        <div class="product-detail" contenteditable="true">GRAUDA</div>
-                        <div class="price-container">
-                            <span class="currency">R$</span>
-                            <span class="price-value" contenteditable="true">88,88</span>
-                            <span class="unit-value"></span>
-                        </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📄</div>
+                    <div class="stat-info">
+                        <h3>Cartazes</h3>
+                        <div class="stat-value">∞</div>
                     </div>
                 </div>
             </div>
+
+            <!-- Actions Grid -->
+            <h2>Acesso Rápido</h2>
+            <div class="dash-grid">
+                <div class="dash-card" id="createPosterBtn">
+                    <div class="card-icon">➕</div>
+                    <h3>Criar Novo Cartaz</h3>
+                </div>
+                <div class="dash-card disabled">
+                    <div class="card-icon">⚙️</div>
+                    <h3>Configurações (Em Breve)</h3>
+                </div>
+            </div>
+
+            <!-- User Management Section -->
+            <div class="user-section">
+                <div class="section-header">
+                    <h2>Gerenciar Usuários</h2>
+                    <button id="showAddUserBtn" class="action-btn">Novo Usuário 👤</button>
+                </div>
+                <div class="table-container">
+                    <table class="user-table">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Email</th>
+                                <th style="text-align:right">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="userTableBody">
+                            <!-- Rows injected by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </main>
+
+        <!-- Add User Modal -->
+        <div id="addUserModal" class="modal hidden">
+            <div class="modal-content">
+                <h3>Novo Usuário</h3>
+                <div class="modal-form">
+                    <input type="text" id="newUserName" placeholder="Nome Completo">
+                    <input type="email" id="newUserEmail" placeholder="E-mail de Acesso">
+                    <input type="password" id="newUserPass" placeholder="Senha">
+                </div>
+                <div class="modal-actions">
+                    <button id="cancelAddUserBtn" class="secondary-btn">Cancelar</button>
+                    <button id="confirmAddUserBtn" class="primary-btn">Salvar Usuário</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- APP VIEW (The Editor) -->
+    <div id="appView" class="view hidden">
+        <div class="app-navbar">
+            <button id="appLogoutBtn" class="nav-btn" style="background-color: #c0392b;">Sair 🚪</button>
+            <span>Editor de Cartazes</span>
+        </div>
+        <div class="app-container">
+            <!-- Sidebar Controls -->
+            <aside class="sidebar" id="sidebar">
+                <div class="logo">
+                    <h1>Cartazista</h1>
+                </div>
+                <!-- ... (rest of sidebar content) ... -->
+
+
+                <div class="control-group">
+                    <h3>Produto</h3>
+                    <label>
+                        <span>Texto de Destaque</span>
+                        <input type="text" id="offerText" placeholder="Ex: OFERTA" value="OFERTA">
+                    </label>
+                    <label>
+                        <span>Nome do Produto</span>
+                        <input type="text" id="productName" placeholder="Ex: Banana Prata" value="BANANA PRATA">
+                    </label>
+                    <label>
+                        <span>Categoria (Opcional)</span>
+                        <input type="text" id="productCategory" value="" placeholder="Ex: Frutas">
+                    </label>
+                    <label>
+                        <span>Detalhe (Opcional)</span>
+                        <input type="text" id="productDetail" placeholder="Ex: Graúda" value="GRAUDA">
+                    </label>
+                    <div class="price-row">
+                        <label>
+                            <span>Preço (R$)</span>
+                            <input type="text" id="productPrice" placeholder="0,00" value="88,88">
+                        </label>
+                        <label>
+                            <span>Unidade</span>
+                            <select id="productUnit">
+                                <option value="">Nenhuma</option>
+                                <option value="Kg">Kg</option>
+                                <option value="Un">Un</option>
+                                <option value="100g">100g</option>
+                            </select>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="control-group" id="paramsGroup">
+                    <!-- Font Sizes -->
+                    <h3>Tamanho da Fonte</h3>
+                    <div class="price-row">
+                        <label style="flex:1">
+                            <span>Oferta</span>
+                            <input type="number" id="fsOffer" step="0.5" value="">
+                        </label>
+                        <label style="flex:1">
+                            <span>Produto</span>
+                            <input type="number" id="fsName" step="0.5" value="">
+                        </label>
+                    </div>
+                    <div class="price-row">
+                        <label style="flex:1">
+                            <span>Categ.</span>
+                            <input type="number" id="fsCategory" step="0.5" value="">
+                        </label>
+                        <label style="flex:1">
+                            <span>Detalhe</span>
+                            <input type="number" id="fsDetail" step="0.5" value="">
+                        </label>
+                    </div>
+                    <div class="price-row">
+                        <label style="flex:1">
+                            <span>Preço</span>
+                            <input type="number" id="fsPrice" step="0.5" value="">
+                        </label>
+                    </div>
+
+                    <!-- Vertical Scaling (Stretching) -->
+                    <h3>Alongamento Vertical</h3>
+                    <div class="price-row">
+                        <label style="flex:1">
+                            <span>Oferta</span>
+                            <input type="number" id="scaleOffer" step="0.1" value="1.0">
+                        </label>
+                        <label style="flex:1">
+                            <span>Produto</span>
+                            <input type="number" id="scaleName" step="0.1" value="1.0">
+                        </label>
+                    </div>
+                    <div class="price-row">
+                        <label style="flex:1">
+                            <span>Categ.</span>
+                            <input type="number" id="scaleCategory" step="0.1" value="1.0">
+                        </label>
+                        <label style="flex:1">
+                            <span>Detalhe</span>
+                            <input type="number" id="scaleDetail" step="0.1" value="1.0">
+                        </label>
+                    </div>
+                    <div class="price-row">
+                        <label style="flex:1">
+                            <span>Preço</span>
+                            <input type="number" id="scalePrice" step="0.1" value="1.0">
+                        </label>
+                    </div>
+
+                    <button id="resetFonts"
+                        style="width:100%; margin-top:10px; padding:5px; background:#444; border:none; color:#ccc; cursor:pointer; border-radius:4px;">Restaurar
+                        Padrão</button>
+                </div>
+
+                <div class="control-group">
+                    <h3>Visual</h3>
+                    <label>
+                        <span>Tema (Fundo)</span>
+                        <select id="backgroundTheme">
+                            <option value="white">Branco (Padrão)</option>
+                            <option value="yellow">Amarelo</option>
+                            <option value="vector" selected>Vetor (Amarelo Principal)</option>
+                        </select>
+                    </label>
+                </div>
+
+                <div class="control-group">
+                    <h3>Layout de Impressão</h3>
+                    <label>
+                        <span>Tamanho do Papel</span>
+                        <select id="paperSize">
+                            <option value="A4">A4 (21 x 29.7 cm)</option>
+                            <option value="A3">A3 (29.7 x 42 cm)</option>
+                            <option value="A5">A5 (14.8 x 21 cm)</option>
+                            <option value="Letter">Carta (21.6 x 27.9 cm)</option>
+                            <option value="Legal">Ofício (21.6 x 35.6 cm)</option>
+                        </select>
+                    </label>
+                    <label>
+                        <span>Formato da Página</span>
+                        <select id="orientation">
+                            <option value="portrait">Retrato (Vertical)</option>
+                            <option value="landscape">Paisagem (Horizontal)</option>
+                        </select>
+                    </label>
+                    <label>
+                        <span>Cartazes por Folha</span>
+                        <select id="gridLayout">
+                            <option value="1">1 (Tela Cheia)</option>
+                            <option value="2">2 Cartazes</option>
+                            <option value="4">4 Cartazes</option>
+                            <option value="8">8 Cartazes</option>
+                        </select>
+                    </label>
+                    <div class="action-buttons">
+                        <button onclick="downloadPDF()" class="pdf-btn" id="btnDownloadPdf">
+                            BAIXAR PDF 📥
+                        </button>
+                        <button onclick="window.print()" class="print-btn">
+                            IMPRIMIR 🖨️
+                        </button>
+                    </div>
+                </div>
+                <!-- Duplicate button removed -->
+            </aside>
+
+            <!-- Toggle Button -->
+            <button id="sidebarToggle" class="sidebar-toggle" title="Ocultar/Mostrar Menu">◀</button>
+
+            <!-- Preview Area -->
+            <main class="preview-area">
+                <div id="printContainer" class="print-container paper-a4 portrait layout-1">
+                    <!-- Poster Template (Repeated via JS) -->
+                    <div class="poster-card">
+                        <div class="vector-bg"></div>
+                        <div class="content">
+                            <div class="offer-label">OFERTA</div>
+                            <div class="product-name" contenteditable="true">BANANA PRATA</div>
+                            <div class="product-detail" contenteditable="true">GRAUDA</div>
+                            <div class="price-container">
+                                <span class="currency">R$</span>
+                                <span class="price-value" contenteditable="true">88,88</span>
+                                <span class="unit-value"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"
