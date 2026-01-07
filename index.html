@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cartazista - Criador de Ofertas</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;600;800&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+
+    <div class="app-container">
+        <!-- Sidebar Controls -->
+        <aside class="sidebar" id="sidebar">
+            <div class="logo">
+                <h1>Cartazista</h1>
+            </div>
+            <!-- ... (rest of sidebar content) ... -->
+
+
+            <div class="control-group">
+                <h3>Produto</h3>
+                <label>
+                    <span>Texto de Destaque</span>
+                    <input type="text" id="offerText" placeholder="Ex: OFERTA" value="OFERTA">
+                </label>
+                <label>
+                    <span>Nome do Produto</span>
+                    <input type="text" id="productName" placeholder="Ex: Banana Prata" value="BANANA PRATA">
+                </label>
+                <label>
+                    <span>Detalhe (Opcional)</span>
+                    <input type="text" id="productDetail" placeholder="Ex: Graúda" value="GRAUDA">
+                </label>
+                <div class="price-row">
+                    <label>
+                        <span>Preço (R$)</span>
+                        <input type="text" id="productPrice" placeholder="0,00" value="88,88">
+                    </label>
+                    <label>
+                        <span>Unidade</span>
+                        <select id="productUnit">
+                            <option value="">Nenhuma</option>
+                            <option value="Kg">Kg</option>
+                            <option value="Un">Un</option>
+                            <option value="100g">100g</option>
+                        </select>
+                    </label>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <h3>Tamanho da Fonte</h3>
+                <div class="price-row">
+                    <label style="flex:1">
+                        <span>Oferta</span>
+                        <input type="number" id="fsOffer" step="0.5" value="">
+                    </label>
+                    <label style="flex:1">
+                        <span>Produto</span>
+                        <input type="number" id="fsName" step="0.5" value="">
+                    </label>
+                </div>
+                <div class="price-row">
+                    <label style="flex:1">
+                        <span>Detalhe</span>
+                        <input type="number" id="fsDetail" step="0.5" value="">
+                    </label>
+                    <label style="flex:1">
+                        <span>Preço</span>
+                        <input type="number" id="fsPrice" step="0.5" value="">
+                    </label>
+                </div>
+                <button id="resetFonts"
+                    style="width:100%; margin-top:10px; padding:5px; background:#444; border:none; color:#ccc; cursor:pointer; border-radius:4px;">Restaurar
+                    Padrão</button>
+            </div>
+
+            <div class="control-group">
+                <h3>Visual</h3>
+                <label>
+                    <span>Modelo de Fundo</span>
+                    <select id="backgroundTheme">
+                        <option value="white">Fundo Branco (Economia)</option>
+                        <option value="vector">Vetor Amarelo</option>
+                    </select>
+                </label>
+            </div>
+
+            <div class="control-group">
+                <h3>Layout de Impressão</h3>
+                <label>
+                    <span>Tamanho do Papel</span>
+                    <select id="paperSize">
+                        <option value="A4">A4 (21 x 29.7 cm)</option>
+                        <option value="A3">A3 (29.7 x 42 cm)</option>
+                        <option value="A5">A5 (14.8 x 21 cm)</option>
+                        <option value="Letter">Carta (21.6 x 27.9 cm)</option>
+                        <option value="Legal">Ofício (21.6 x 35.6 cm)</option>
+                    </select>
+                </label>
+                <label>
+                    <span>Formato da Página</span>
+                    <select id="orientation">
+                        <option value="portrait">Retrato (Vertical)</option>
+                        <option value="landscape">Paisagem (Horizontal)</option>
+                    </select>
+                </label>
+                <label>
+                    <span>Cartazes por Folha</span>
+                    <select id="gridLayout">
+                        <option value="1">1 (Tela Cheia)</option>
+                        <option value="2">2 Cartazes</option>
+                        <option value="4">4 Cartazes</option>
+                        <option value="8">8 Cartazes</option>
+                    </select>
+                </label>
+                <div class="action-buttons">
+                    <button onclick="downloadPDF()" class="pdf-btn" id="btnDownloadPdf">
+                        BAIXAR PDF 📥
+                    </button>
+                    <button onclick="window.print()" class="print-btn">
+                        IMPRIMIR 🖨️
+                    </button>
+                </div>
+            </div>
+            <!-- Duplicate button removed -->
+        </aside>
+
+        <!-- Toggle Button -->
+        <button id="sidebarToggle" class="sidebar-toggle" title="Ocultar/Mostrar Menu">◀</button>
+
+        <!-- Preview Area -->
+        <main class="preview-area">
+            <div id="printContainer" class="print-container paper-a4 portrait layout-1">
+                <!-- Poster Template (Repeated via JS) -->
+                <div class="poster-card">
+                    <div class="vector-bg"></div>
+                    <div class="content">
+                        <div class="offer-label">OFERTA</div>
+                        <div class="product-name" contenteditable="true">BANANA PRATA</div>
+                        <div class="product-detail" contenteditable="true">GRAUDA</div>
+                        <div class="price-container">
+                            <span class="currency">R$</span>
+                            <span class="price-value" contenteditable="true">88,88</span>
+                            <span class="unit-value"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"
+        integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="mobile_scale.js"></script>
+    <script src="print_fix.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>
