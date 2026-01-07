@@ -9,8 +9,8 @@ function updatePreviewScale() {
     printContainer.style.width = '';
     printContainer.style.margin = '0'; // Reset margin to allow accurate measurement
 
-    const previewWidth = previewArea.clientWidth - 40; // 40px padding total
-    const previewHeight = previewArea.clientHeight - 40; // Check height too for desktop
+    const previewWidth = previewArea.clientWidth - 20; // 20px padding total
+    const previewHeight = previewArea.clientHeight - 20; // Check height too for desktop
 
     // Reset parent alignment to prevent double-centering (Flex center + JS translate)
     previewArea.style.justifyContent = 'flex-start';
@@ -24,12 +24,7 @@ function updatePreviewScale() {
     // Calculate Scale to fit both width and height (contain)
     const scaleX = previewWidth / naturalWidth;
     const scaleY = previewHeight / naturalHeight;
-    const scale = Math.min(scaleX, scaleY, 1); // Never scale up beyond 1.0 (pixelated), but shrink to fit
-    // Actually, user might want to see A5 bigger? 
-    // Usually preview means "show whole page". 
-    // Let's cap at 1.0 for clarity, or maybe 1.2? 
-    // Let's stick to min(..., 1) to avoid blur, unless screen is huge. 
-    // Actually, on desktop, fitting A5 (148mm) on a 1920px screen is fine.
+    const scale = Math.min(scaleX, scaleY); // Allow scaling > 1 to fill screen
 
     // Apply transform
     // Center it.
@@ -44,14 +39,8 @@ function updatePreviewScale() {
     printContainer.style.transformOrigin = 'top left';
     printContainer.style.transform = `translate(${offsetX}px, ${Math.max(offsetY, 20)}px) scale(${scale})`;
 
-    // Prevent scrolling if it fits
-    if (finalHeight <= previewArea.clientHeight) {
-        previewArea.style.overflow = 'hidden';
-    } else {
-        previewArea.style.overflow = 'auto'; // allow scroll if somehow vertical overrides
-        // In "contain" logic (scaleY), it should always fit vertical unless min scale is hit??
-        // scaling ensures it fits.
-    }
+    // Prevent scrolling - we want it contained
+    previewArea.style.overflow = 'hidden';
 }
 
 window.addEventListener('resize', updatePreviewScale);

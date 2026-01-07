@@ -161,8 +161,12 @@ select {
     color: white;
     border: none;
     cursor: pointer;
-    z-index: 100;
-    /* Above sidebar */
+    user-select: none;
+    /* Prevent text selection while dragging */
+    touch-action: none;
+    /* Prevent scroll on touch */
+    z-index: 1000;
+    /* Float above others */
     align-items: center;
     justify-content: center;
     font-size: 1.2rem;
@@ -218,8 +222,9 @@ input[type="number"] {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 40px;
-    overflow: auto;
+    padding: 10px;
+    overflow: hidden;
+    /* Force scale to handle fitting */
 }
 
 /* Print Container (The Paper) */
@@ -386,6 +391,12 @@ input[type="number"] {
     --fs-name: 6rem;
     --fs-detail: 3rem;
     --fs-price: 9rem;
+
+    /* Vertical Scale Defaults */
+    --scale-y-offer: 1;
+    --scale-y-name: 1;
+    --scale-y-detail: 1;
+    --scale-y-price: 1;
 }
 
 /* 2 Up - Increase specificity to override base if needed, 
@@ -405,16 +416,32 @@ input[type="number"] {
 #printContainer.layout-4 {
     --fs-offer: 3rem;
     --fs-name: 3.5rem;
-    --fs-detail: 2rem;
-    --fs-price: 5.5rem;
+    --fs-category: 2.5rem;
+    --fs-detail: 3rem;
+    --fs-price: 9rem;
+
+    /* Vertical Scale Defaults */
+    --scale-y-offer: 1;
+    --scale-y-name: 1;
+    --scale-y-category: 1;
+    --scale-y-detail: 1;
+    --scale-y-price: 1;
 }
 
 /* 8 Up */
 #printContainer.layout-8 {
     --fs-offer: 2rem;
     --fs-name: 2.2rem;
+    --fs-category: 1.8rem;
     --fs-detail: 1.4rem;
     --fs-price: 4rem;
+
+    /* Vertical Scale Defaults */
+    --scale-y-offer: 1;
+    --scale-y-name: 1;
+    --scale-y-category: 1;
+    --scale-y-detail: 1;
+    --scale-y-price: 1;
 }
 
 .offer-label {
@@ -422,27 +449,52 @@ input[type="number"] {
     font-size: var(--fs-offer);
     /* Increased from 3rem */
     margin-bottom: 0.5rem;
-    transform: rotate(-2deg);
+    margin-bottom: 0.5rem;
+    transform: rotate(-2deg) scaleY(var(--scale-y-offer));
+    transform-origin: center;
+    display: inline-block;
+    /* Required for transform */
 }
 
 .product-name {
     font-size: var(--fs-name);
-    /* Increased from 4rem */
-    line-height: 0.9;
-    margin-bottom: 0.5rem;
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 0.2rem;
+    transform: scaleY(var(--scale-y-name));
+    transform-origin: bottom center;
+    display: inline-block;
+    /* Required for transform */
+}
+
+.product-category {
+    font-size: var(--fs-category);
+    font-weight: 600;
+    margin-bottom: 0.2rem;
+    color: var(--poster-color-black);
+    transform: scaleY(var(--scale-y-category));
+    transform-origin: bottom center;
+    display: inline-block;
 }
 
 .product-detail {
     font-size: var(--fs-detail);
     /* Increased from 2rem */
     margin-bottom: 0.5rem;
+    transform: scaleY(var(--scale-y-detail));
+    transform-origin: bottom;
+    display: block;
 }
 
 .price-container {
     color: var(--poster-color-red);
     font-size: var(--fs-price);
     /* Increased from 6rem */
+    /* Increased from 6rem */
     line-height: 0.9;
+    transform: scaleY(var(--scale-y-price));
+    transform-origin: bottom;
+    display: block;
 }
 
 .price-value {
@@ -580,4 +632,16 @@ input[type="number"] {
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
     }
+}
+
+/* Draggable helper */
+.draggable {
+    cursor: move;
+    position: relative;
+    user-select: none;
+    z-index: 1000;
+}
+
+.draggable:active {
+    cursor: grabbing;
 }

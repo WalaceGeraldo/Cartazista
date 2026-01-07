@@ -1,6 +1,7 @@
 const elements = {
     offerText: document.getElementById('offerText'),
     productName: document.getElementById('productName'),
+    productCategory: document.getElementById('productCategory'),
     productDetail: document.getElementById('productDetail'),
     productPrice: document.getElementById('productPrice'),
     productUnit: document.getElementById('productUnit'),
@@ -67,18 +68,20 @@ function addEventListeners() {
     // Inputs (Bulk actions)
     elements.offerText.addEventListener('input', (e) => { defaults.offer = e.target.value; updateAllCardsWithDefaults(); });
     elements.productName.addEventListener('input', (e) => { defaults.name = e.target.value; updateAllCardsWithDefaults(); });
+    elements.productCategory.addEventListener('input', (e) => { defaults.category = e.target.value; updateAllCardsWithDefaults(); });
     elements.productDetail.addEventListener('input', (e) => { defaults.detail = e.target.value; updateAllCardsWithDefaults(); });
     elements.productPrice.addEventListener('input', (e) => { defaults.price = e.target.value; updateAllCardsWithDefaults(); });
     elements.productUnit.addEventListener('change', (e) => { defaults.unit = e.target.value; updateAllCardsWithDefaults(); });
 
     // Font Size Controls
-    const fontInputs = ['fsOffer', 'fsName', 'fsDetail', 'fsPrice'];
-    const cssVars = ['--fs-offer', '--fs-name', '--fs-detail', '--fs-price'];
+    const fontInputs = ['fsOffer', 'fsName', 'fsCategory', 'fsDetail', 'fsPrice'];
+    const cssVars = ['--fs-offer', '--fs-name', '--fs-category', '--fs-detail', '--fs-price'];
 
     // Default values for 1-up layout (matches CSS)
     const defaultFonts = {
         'fsOffer': 5,
         'fsName': 6,
+        'fsCategory': 2.5,
         'fsDetail': 3,
         'fsPrice': 9
     };
@@ -102,12 +105,40 @@ function addEventListeners() {
         }
     });
 
+    // Vertical Scale Controls
+    const scaleInputs = ['scaleOffer', 'scaleName', 'scaleCategory', 'scaleDetail', 'scalePrice'];
+    const scaleVars = ['--scale-y-offer', '--scale-y-name', '--scale-y-category', '--scale-y-detail', '--scale-y-price'];
+
+    scaleInputs.forEach((id, index) => {
+        const input = document.getElementById(id);
+        if (input) {
+            input.addEventListener('input', (e) => {
+                const val = e.target.value;
+                if (val) {
+                    elements.printContainer.style.setProperty(scaleVars[index], val);
+                } else {
+                    elements.printContainer.style.removeProperty(scaleVars[index]);
+                }
+            });
+        }
+    });
+
     document.getElementById('resetFonts').addEventListener('click', () => {
+        // Reset Fonts
         fontInputs.forEach((id, index) => {
             const input = document.getElementById(id);
             if (input) {
                 input.value = defaultFonts[id] || '';
                 elements.printContainer.style.setProperty(cssVars[index], `${input.value}rem`);
+            }
+        });
+
+        // Reset Scales
+        scaleInputs.forEach((id, index) => {
+            const input = document.getElementById(id);
+            if (input) {
+                input.value = "1.0";
+                elements.printContainer.style.setProperty(scaleVars[index], "1");
             }
         });
     });
@@ -220,21 +251,28 @@ function createPosterCard(data, index) {
     const offer = document.createElement('div');
     offer.className = 'offer-label';
     offer.innerText = data.offer; // Use state data
-    offer.contentEditable = true; // Make editable
-    offer.oninput = (e) => { cardsState[index].offer = e.target.innerText; };
+    setupInteraction(offer, index, 'offer');
 
     // Editable Fields
     const name = document.createElement('div');
     name.className = 'product-name';
     name.innerText = data.name;
-    name.contentEditable = true;
-    name.oninput = (e) => { cardsState[index].name = e.target.innerText; };
+    setupInteraction(name, index, 'name');
+
+    // New Category Element
+    const category = document.createElement('div');
+    category.className = 'product-category';
+    // Only show if it has text
+    if (data.category) {
+        category.innerText = data.category;
+        setupInteraction(category, index, 'category');
+    }
 
     const detail = document.createElement('div');
     detail.className = 'product-detail';
+
     detail.innerText = data.detail;
-    detail.contentEditable = true;
-    detail.oninput = (e) => { cardsState[index].detail = e.target.innerText; };
+    setupInteraction(detail, index, 'detail');
 
     const priceContainer = document.createElement('div');
     priceContainer.className = 'price-container';
@@ -246,23 +284,54 @@ function createPosterCard(data, index) {
     const priceVal = document.createElement('span');
     priceVal.className = 'price-value';
     priceVal.innerText = data.price;
-    priceVal.contentEditable = true;
-    priceVal.oninput = (e) => { cardsState[index].price = e.target.innerText; };
+    // Removed redundant setupInteraction(priceVal) to avoid conflict with manual setup below
+
+
+    // Better strategy for price: 
+    // The Container is draggable.
+    // The Value inside is editable.
+    // If I double click the container, I might want to edit the price.
+
+    // Let's attach interaction to priceVal specifically for editing, 
+    // AND attach DRAG to priceContainer.
+
+    // But wait, setupInteraction does both?
+    // Price Value needs to be editable
+    priceVal.contentEditable = false;
+    priceVal.addEventListener('dblclick', (e) => {
+        e.stopPropagation();
+        priceVal.contentEditable = true;
+        priceVal.focus();
+    });
+    priceVal.addEventListener('blur', () => {
+        priceVal.contentEditable = false;
+        cardsState[index].price = priceVal.innerText;
+    });
+    priceVal.addEventListener('input', (e) => {
+        cardsState[index].price = e.target.innerText;
+    });
 
     const unitVal = document.createElement('span');
     unitVal.className = 'unit-value';
     unitVal.style.fontSize = "0.4em";
     unitVal.innerText = data.unit ? ` /${data.unit}` : '';
-    // Unit changing via contenteditable is tricky, let's leave it controllable via global or maybe click-to-cycle? 
-    // For now, let's just render it. If user wants different units, they might need to type it in price or we add a complex editor.
-    // Let's assume price/name editing is the main need.
 
     priceContainer.appendChild(currency);
     priceContainer.appendChild(priceVal);
     priceContainer.appendChild(unitVal);
 
+    // Make the whole container draggable
+    makeDraggable(priceContainer);
+    // BUT, double clicking the container (outside priceVal) triggers what?
+    // Maybe nothing, or we focus priceVal? 
+    // For now, let's keep it simple: drag container, dblclick price number to edit.
+
+    // Remove redundant makeDraggable calls from previous step
+
+
     content.appendChild(offer);
     content.appendChild(name);
+    if (data.category) content.appendChild(category); // Append Category
     if (data.detail) content.appendChild(detail);
     content.appendChild(priceContainer);
 
@@ -270,6 +339,160 @@ function createPosterCard(data, index) {
 
     return card;
 }
+
+// Helper to manage Drag + Edit
+function setupInteraction(element, dataIndex, dataField) {
+    // 1. Dragging
+    makeDraggable(element);
+
+    // 2. Editing (Double Click)
+    element.contentEditable = false; // Start forbidden
+
+    element.addEventListener('dblclick', (e) => {
+        e.stopPropagation(); // prevent triggering drag start if bubbles
+        element.contentEditable = true;
+        element.focus();
+        element.classList.add('editing');
+        // Optional: select all text
+        // document.execCommand('selectAll', false, null); 
+    });
+
+    element.addEventListener('blur', () => {
+        element.contentEditable = false;
+        element.classList.remove('editing');
+        // Save data
+        if (dataIndex !== undefined && dataField) {
+            cardsState[dataIndex][dataField] = element.innerText;
+        }
+    });
+
+    // Input listener to sync state while editing
+    element.addEventListener('input', (e) => {
+        if (dataIndex !== undefined && dataField) {
+            cardsState[dataIndex][dataField] = e.target.innerText;
+        }
+    });
+}
+
+// Drag and Drop Logic
+let activeDragElement = null;
+let dragStartX = 0;
+let dragStartY = 0;
+let initialLeft = 0;
+let initialTop = 0;
+let currentScale = 1;
+
+function makeDraggable(element) {
+    if (!element) return;
+    // console.log('Making draggable:', element.className, element.innerText);
+    element.classList.add('draggable');
+    element.style.position = 'relative'; // FORCE relative immediately
+    element.addEventListener('mousedown', dragStart);
+    element.addEventListener('touchstart', dragStart, { passive: false });
+}
+
+function dragStart(e) {
+    // console.log('Drag Start Triggered', e.type);
+    // Determine input type
+    let clientX, clientY;
+    if (e.type === 'touchstart') {
+        clientX = e.touches[0].clientX;
+        clientY = e.touches[0].clientY;
+    } else {
+        // Only left click for mouse
+        if (e.button !== 0) return;
+        clientX = e.clientX;
+        clientY = e.clientY;
+    }
+
+    const target = e.currentTarget;
+
+    // CRITICAL: Do NOT start drag if we are currently editing this element
+    if (target.isContentEditable) return;
+
+    activeDragElement = target;
+
+    // Calculate current scale of the container to adjust mouse movement
+    const container = document.getElementById('printContainer');
+    // We try to parse the inline style first as it's most accurate from mobile_scale.js
+    const transform = container.style.transform;
+    const match = transform && transform.match(/scale\(([^)]+)\)/);
+    if (match) {
+        currentScale = parseFloat(match[1]);
+    } else {
+        // Fallback to computed style (matrix)
+        const style = window.getComputedStyle(container);
+        const matrix = style.transform; // matrix(a, b, c, d, tx, ty)
+        if (matrix && matrix !== 'none') {
+            const values = matrix.split('(')[1].split(')')[0].split(',');
+            currentScale = parseFloat(values[0]); // a = scaleX
+        } else {
+            currentScale = 1;
+        }
+    }
+    // Safety check
+    if (!currentScale || currentScale <= 0) currentScale = 1;
+
+    // Prevent default to stop scrolling on touch
+    if (e.type === 'touchstart' || !target.isContentEditable) {
+        e.preventDefault();
+    }
+
+    // FORCE position relative if not set
+    const computedStyle = window.getComputedStyle(activeDragElement);
+    if (computedStyle.position === 'static' || !activeDragElement.style.position) {
+        activeDragElement.style.position = 'relative';
+    }
+
+    dragStartX = clientX;
+    dragStartY = clientY;
+
+    // Use inline style for tracking accumulated movement 
+    // (computed style might reset to 0 relative to flow if we don't track it)
+    initialLeft = parseFloat(activeDragElement.style.left) || 0;
+    initialTop = parseFloat(activeDragElement.style.top) || 0;
+
+    if (e.type === 'touchstart') {
+        document.addEventListener('touchmove', drag, { passive: false });
+        document.addEventListener('touchend', dragEnd);
+    } else {
+        document.addEventListener('mousemove', drag);
+        document.addEventListener('mouseup', dragEnd);
+    }
+}
+
+function drag(e) {
+    if (!activeDragElement) return;
+
+    e.preventDefault(); // Prevent scrolling
+
+    // console.log('Dragging...', e.type);
+
+    let clientX, clientY;
+    if (e.type === 'touchmove') {
+        clientX = e.touches[0].clientX;
+        clientY = e.touches[0].clientY;
+    } else {
+        clientX = e.clientX;
+        clientY = e.clientY;
+    }
+
+    // Adjust delta by scale
+    const dx = (clientX - dragStartX) / currentScale;
+    const dy = (clientY - dragStartY) / currentScale;
+
+    activeDragElement.style.left = `${initialLeft + dx}px`;
+    activeDragElement.style.top = `${initialTop + dy}px`;
+}
+
+function dragEnd(e) {
+    activeDragElement = null;
+    document.removeEventListener('mousemove', drag);
+    document.removeEventListener('mouseup', dragEnd);
+    document.removeEventListener('touchmove', drag);
+    document.removeEventListener('touchend', dragEnd);
+}
+
 
 async function downloadPDF() {
     const element = document.getElementById('printContainer');

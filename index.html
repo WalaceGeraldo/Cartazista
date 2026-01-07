@@ -34,6 +34,10 @@
                     <input type="text" id="productName" placeholder="Ex: Banana Prata" value="BANANA PRATA">
                 </label>
                 <label>
+                    <span>Categoria (Opcional)</span>
+                    <input type="text" id="productCategory" value="" placeholder="Ex: Frutas">
+                </label>
+                <label>
                     <span>Detalhe (Opcional)</span>
                     <input type="text" id="productDetail" placeholder="Ex: Graúda" value="GRAUDA">
                 </label>
@@ -54,7 +58,8 @@
                 </div>
             </div>
 
-            <div class="control-group">
+            <div class="control-group" id="paramsGroup">
+                <!-- Font Sizes -->
                 <h3>Tamanho da Fonte</h3>
                 <div class="price-row">
                     <label style="flex:1">
@@ -68,14 +73,50 @@
                 </div>
                 <div class="price-row">
                     <label style="flex:1">
+                        <span>Categ.</span>
+                        <input type="number" id="fsCategory" step="0.5" value="">
+                    </label>
+                    <label style="flex:1">
                         <span>Detalhe</span>
                         <input type="number" id="fsDetail" step="0.5" value="">
                     </label>
+                </div>
+                <div class="price-row">
                     <label style="flex:1">
                         <span>Preço</span>
                         <input type="number" id="fsPrice" step="0.5" value="">
                     </label>
                 </div>
+
+                <!-- Vertical Scaling (Stretching) -->
+                <h3>Alongamento Vertical</h3>
+                <div class="price-row">
+                    <label style="flex:1">
+                        <span>Oferta</span>
+                        <input type="number" id="scaleOffer" step="0.1" value="1.0">
+                    </label>
+                    <label style="flex:1">
+                        <span>Produto</span>
+                        <input type="number" id="scaleName" step="0.1" value="1.0">
+                    </label>
+                </div>
+                <div class="price-row">
+                    <label style="flex:1">
+                        <span>Categ.</span>
+                        <input type="number" id="scaleCategory" step="0.1" value="1.0">
+                    </label>
+                    <label style="flex:1">
+                        <span>Detalhe</span>
+                        <input type="number" id="scaleDetail" step="0.1" value="1.0">
+                    </label>
+                </div>
+                <div class="price-row">
+                    <label style="flex:1">
+                        <span>Preço</span>
+                        <input type="number" id="scalePrice" step="0.1" value="1.0">
+                    </label>
+                </div>
+
                 <button id="resetFonts"
                     style="width:100%; margin-top:10px; padding:5px; background:#444; border:none; color:#ccc; cursor:pointer; border-radius:4px;">Restaurar
                     Padrão</button>
