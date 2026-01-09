@@ -60,24 +60,154 @@ body {
     gap: 15px;
 }
 
-.menu-btn {
-    background: #0084ff;
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 36px;
-    height: 36px;
+.nav-title {
+    font-weight: 700;
+    color: #333;
     font-size: 1.2rem;
+}
+
+
+/* User Menu Wrapper */
+.user-menu-wrapper {
+    position: relative;
+}
+
+.user-avatar-circle {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #00d2d3 0%, #0abde3 100%);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
     cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 210, 211, 0.3);
+}
+
+.user-avatar-circle:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 210, 211, 0.5);
+}
+
+/* Menu Dropdown */
+.menu-dropdown {
+    position: absolute;
+    top: 55px;
+    right: 0;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+    min-width: 280px;
+    overflow: hidden;
+    z-index: 1000;
+    animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.menu-dropdown.hidden {
+    display: none;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Menu Header with User Info */
+.menu-header {
+    padding: 16px;
+    background: linear-gradient(135deg, #00d2d3 0%, #0abde3 100%);
+}
+
+.menu-user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.menu-avatar {
+    width: 48px;
+    height: 48px;
+    background: rgba(255, 255, 255, 0.3);
+    border: 2px solid white;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.menu-user-details {
+    flex: 1;
+    color: white;
+}
+
+.menu-user-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin-bottom: 2px;
+}
+
+.menu-user-email {
+    font-size: 0.8rem;
+    opacity: 0.9;
+}
+
+/* Menu Items */
+.menu-dropdown-item {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    background: white;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.95rem;
+    color: #333;
+    font-weight: 500;
+}
+
+.menu-dropdown-item:hover {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.menu-item-icon {
+    font-size: 1.2rem;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-.nav-title {
-    font-weight: 600;
-    color: #333;
+.menu-item-text {
+    flex: 1;
 }
+
+.menu-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #e0e0e0, transparent);
+    margin: 8px 0;
+}
+
+.menu-dropdown-item.menu-item-danger:hover {
+    background: linear-gradient(135deg, #ff5252 0%, #f44336 100%);
+    color: white;
+}
+
+
 
 .notification-badge {
     position: relative;

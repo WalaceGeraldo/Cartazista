@@ -113,6 +113,90 @@ function initAuthListeners() {
         showView('app');
     });
 
+    // Menu Toggle (User Avatar Click)
+    const userAvatarBtn = document.getElementById('userAvatarBtn');
+    const menuDropdown = document.getElementById('menuDropdown');
+
+    userAvatarBtn?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        menuDropdown?.classList.toggle('hidden');
+
+        // Populate user info in menu header
+        const session = getSession();
+        if (session) {
+            const menuUserName = document.getElementById('menuUserName');
+            const menuUserEmail = document.getElementById('menuUserEmail');
+            const menuAvatar = document.querySelector('.menu-avatar');
+
+            if (menuUserName) menuUserName.innerText = session.name;
+            if (menuUserEmail) menuUserEmail.innerText = session.email;
+
+            // Update menu avatar initials
+            if (menuAvatar) {
+                const initials = session.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+                menuAvatar.innerText = initials;
+            }
+        }
+    });
+
+    // Close menu when clicking outside
+    document.addEventListener('click', (e) => {
+        if (menuDropdown && !menuDropdown.classList.contains('hidden')) {
+            if (!userAvatarBtn?.contains(e.target) && !menuDropdown?.contains(e.target)) {
+                menuDropdown.classList.add('hidden');
+            }
+        }
+    });
+
+    // User Logout from Menu
+    document.getElementById('userLogoutBtn')?.addEventListener('click', () => {
+        logout();
+        showView('login');
+    });
+
+    // Menu: Edit Profile
+    document.getElementById('menuEditProfileBtn')?.addEventListener('click', () => {
+        menuDropdown?.classList.add('hidden');
+        alert('🎨 Funcionalidade "Editar Perfil" em desenvolvimento!\n\nEm breve você poderá:\n• Alterar nome e foto de perfil\n• Atualizar informações da loja\n• Personalizar preferências');
+    });
+
+    // Menu: Settings
+    document.getElementById('menuSettingsBtn')?.addEventListener('click', () => {
+        menuDropdown?.classList.add('hidden');
+        alert('⚙️ Funcionalidade "Configurações" em desenvolvimento!\n\nEm breve você poderá:\n• Configurar tema (claro/escuro)\n• Ajustar preferências de impressão\n• Gerenciar notificações\n• Configurar moeda e idioma');
+    });
+
+    // Menu: Templates
+    document.getElementById('menuTemplatesBtn')?.addEventListener('click', () => {
+        menuDropdown?.classList.add('hidden');
+        alert('📋 Funcionalidade "Meus Templates" em desenvolvimento!\n\nEm breve você poderá:\n• Salvar templates personalizados\n• Carregar templates salvos\n• Compartilhar templates\n• Importar templates da comunidade');
+    });
+
+    // Menu: Upgrade Plan
+    document.getElementById('menuUpgradeBtn')?.addEventListener('click', () => {
+        menuDropdown?.classList.add('hidden');
+        const session = getSession();
+        if (session) {
+            const planKey = session.plan || 'free';
+            const planData = PLANS[planKey] || PLANS['free'];
+            alert(`👑 UPGRADE DE PLANO\n\nPlano Atual: ${planData.label}\nLimite: ${planData.limit} cartazes/mês\n\n📊 PLANOS DISPONÍVEIS:\n\n🆓 Gratuito - 5 cartazes/mês\n⭐ Básico - 25 cartazes/mês - R$ 19,90/mês\n👑 Pro - 100 cartazes/mês - R$ 49,90/mês\n\n💡 Funcionalidade de pagamento em breve!`);
+        }
+    });
+
+    // Menu: Help & Support
+    document.getElementById('menuHelpBtn')?.addEventListener('click', () => {
+        menuDropdown?.classList.add('hidden');
+        alert('❓ AJUDA & SUPORTE\n\n📚 Recursos disponíveis:\n• Tutoriais em vídeo\n• Documentação completa\n• FAQ - Perguntas frequentes\n• Suporte por e-mail\n\n📧 Contato: suporte@cartazista.com\n💬 WhatsApp: (11) 99999-9999\n\n🕐 Horário de atendimento:\nSeg-Sex: 9h às 18h');
+    });
+
+    // Menu: About
+    document.getElementById('menuAboutBtn')?.addEventListener('click', () => {
+        menuDropdown?.classList.add('hidden');
+        alert('ℹ️ SOBRE O CARTAZISTA\n\n🎨 Versão: 2.0.0\n📅 Última atualização: Janeiro 2026\n\n💡 Cartazista é a solução completa para criar cartazes profissionais de ofertas para seu comércio.\n\n✨ Recursos:\n• Editor visual intuitivo\n• Múltiplos layouts\n• Exportação em PDF\n• Templates personalizáveis\n\n👨‍💻 Desenvolvido com ❤️ para pequenos e médios comerciantes\n\n© 2026 Cartazista - Todos os direitos reservados');
+    });
+
+
+
     // Sidebar Toggle
     document.getElementById('sidebarToggle')?.addEventListener('click', (e) => {
         const app = document.querySelector('.app-container');

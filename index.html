@@ -134,8 +134,7 @@
         <!-- Top Navigation -->
         <nav class="dash-nav">
             <div class="nav-left">
-                <button class="menu-btn">☰</button>
-                <span class="nav-title">Menu</span>
+                <span class="nav-title">Cartazista</span>
             </div>
             <div class="nav-right">
                 <div class="notification-badge">
@@ -145,7 +144,52 @@
                 <div class="user-pill">
                     <span>👤 Plano Gratuito</span>
                 </div>
-                <div class="user-avatar-circle" id="userAvatarBtn">TR</div>
+                <div class="user-menu-wrapper">
+                    <div class="user-avatar-circle" id="userAvatarBtn">TR</div>
+                    <!-- Dropdown Menu -->
+                    <div class="menu-dropdown hidden" id="menuDropdown">
+                        <div class="menu-header">
+                            <div class="menu-user-info">
+                                <div class="menu-avatar">TR</div>
+                                <div class="menu-user-details">
+                                    <div class="menu-user-name" id="menuUserName">Thiago Ribeiro</div>
+                                    <div class="menu-user-email" id="menuUserEmail">usuario@email.com</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="menu-divider"></div>
+                        <button class="menu-dropdown-item" id="menuEditProfileBtn">
+                            <span class="menu-item-icon">👤</span>
+                            <span class="menu-item-text">Editar Perfil</span>
+                        </button>
+                        <button class="menu-dropdown-item" id="menuSettingsBtn">
+                            <span class="menu-item-icon">⚙️</span>
+                            <span class="menu-item-text">Configurações</span>
+                        </button>
+                        <button class="menu-dropdown-item" id="menuTemplatesBtn">
+                            <span class="menu-item-icon">📋</span>
+                            <span class="menu-item-text">Meus Templates</span>
+                        </button>
+                        <button class="menu-dropdown-item" id="menuUpgradeBtn">
+                            <span class="menu-item-icon">👑</span>
+                            <span class="menu-item-text">Fazer Upgrade</span>
+                        </button>
+                        <div class="menu-divider"></div>
+                        <button class="menu-dropdown-item" id="menuHelpBtn">
+                            <span class="menu-item-icon">❓</span>
+                            <span class="menu-item-text">Ajuda & Suporte</span>
+                        </button>
+                        <button class="menu-dropdown-item" id="menuAboutBtn">
+                            <span class="menu-item-icon">ℹ️</span>
+                            <span class="menu-item-text">Sobre o App</span>
+                        </button>
+                        <div class="menu-divider"></div>
+                        <button class="menu-dropdown-item menu-item-danger" id="userLogoutBtn">
+                            <span class="menu-item-icon">🚪</span>
+                            <span class="menu-item-text">Sair</span>
+                        </button>
+                    </div>
+                </div>
             </div>
         </nav>
 
