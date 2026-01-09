@@ -29,16 +29,25 @@
         </div>
     </div>
 
-    <!-- DASHBOARD VIEW -->
-    <div id="dashboardView" class="view hidden">
-        <header class="dash-header">
-            <div class="dash-logo">Cartazista <span>Admin</span></div>
-            <button id="logoutBtn" class="logout-btn">Sair 🚪</button>
-        </header>
+
+    <!-- ADMIN DASHBOARD VIEW -->
+    <div id="adminDashboardView" class="view hidden">
+        <!-- Admin Nav -->
+        <nav class="dash-nav admin-nav">
+            <div class="nav-left">
+                <div class="dash-logo">Cartazista <span
+                        style="font-size: 0.8rem; color: #888; font-weight: normal;">Admin</span></div>
+            </div>
+            <div class="nav-right">
+                <button id="adminLogoutBtn" class="logout-btn"
+                    style="background: none; color: #555; border: 1px solid #ddd; padding: 5px 15px; border-radius: 6px;">Sair
+                    🚪</button>
+            </div>
+        </nav>
         <main class="dash-content">
             <div class="dash-welcome">
                 <h1>Painel Administrativo</h1>
-                <p>Bem-vindo, <span id="currentUserDisplay">Admin</span></p>
+                <p>Bem-vindo, <span id="adminUserDisplay">Admin</span></p>
             </div>
 
             <!-- Stats Row -->
@@ -50,33 +59,17 @@
                         <div class="stat-value" id="statsUserCount">1</div>
                     </div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-icon">📄</div>
-                    <div class="stat-info">
-                        <h3>Cartazes</h3>
-                        <div class="stat-value">∞</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Actions Grid -->
-            <h2>Acesso Rápido</h2>
-            <div class="dash-grid">
-                <div class="dash-card" id="createPosterBtn">
-                    <div class="card-icon">➕</div>
-                    <h3>Criar Novo Cartaz</h3>
-                </div>
-                <div class="dash-card disabled">
-                    <div class="card-icon">⚙️</div>
-                    <h3>Configurações (Em Breve)</h3>
-                </div>
             </div>
 
             <!-- User Management Section -->
             <div class="user-section">
                 <div class="section-header">
                     <h2>Gerenciar Usuários</h2>
-                    <button id="showAddUserBtn" class="action-btn">Novo Usuário 👤</button>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" id="userSearchInput" placeholder="Buscar usuário..."
+                            style="padding: 8px; border-radius: 5px; border: 1px solid #333; background: #222; color: white;">
+                        <button id="showAddUserBtn" class="action-btn">Novo Usuário 👤</button>
+                    </div>
                 </div>
                 <div class="table-container">
                     <table class="user-table">
@@ -84,6 +77,7 @@
                             <tr>
                                 <th>Nome</th>
                                 <th>Email</th>
+                                <th>Plano</th>
                                 <th style="text-align:right">Ações</th>
                             </tr>
                         </thead>
@@ -95,7 +89,7 @@
             </div>
         </main>
 
-        <!-- Add User Modal -->
+        <!-- Add User Modal (Shared or scoped) -->
         <div id="addUserModal" class="modal hidden">
             <div class="modal-content">
                 <h3>Novo Usuário</h3>
@@ -110,14 +104,262 @@
                 </div>
             </div>
         </div>
+
+        <!-- Edit User Modal -->
+        <div id="editUserModal" class="modal hidden">
+            <div class="modal-content">
+                <h3>Editar Usuário</h3>
+                <div class="modal-form">
+                    <input type="hidden" id="editUserId">
+                    <input type="text" id="editUserName" placeholder="Nome Completo">
+                    <input type="email" id="editUserEmail" placeholder="E-mail de Acesso">
+                    <select id="editUserPlan"
+                        style="width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 4px; border: 1px solid #ddd;">
+                        <option value="free">Plano Gratuito (5 Prints)</option>
+                        <option value="basic">Plano Básico (25 Prints)</option>
+                        <option value="pro">Plano Pro (100 Prints)</option>
+                    </select>
+                    <input type="password" id="editUserPass" placeholder="Nova Senha (deixe em branco para manter)">
+                </div>
+                <div class="modal-actions">
+                    <button id="cancelEditUserBtn" class="secondary-btn">Cancelar</button>
+                    <button id="confirmEditUserBtn" class="primary-btn">Salvar Alterações</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- USER DASHBOARD VIEW (New Design) -->
+    <div id="userDashboardView" class="view hidden" style="background-color: var(--bg-color); min-height: 100vh;">
+        <!-- Top Navigation -->
+        <nav class="dash-nav">
+            <div class="nav-left">
+                <button class="menu-btn">☰</button>
+                <span class="nav-title">Menu</span>
+            </div>
+            <div class="nav-right">
+                <div class="notification-badge">
+                    <span class="bell">🔔</span>
+                    <span class="badge-count">4</span>
+                </div>
+                <div class="user-pill">
+                    <span>👤 Plano Gratuito</span>
+                </div>
+                <div class="user-avatar-circle" id="userAvatarBtn">TR</div>
+            </div>
+        </nav>
+
+        <main class="dash-content-wrapper">
+            <!-- Welcome Header -->
+            <header class="welcome-header">
+                <div class="user-avatar-large">TR</div>
+                <div class="welcome-text">
+                    <h1>BEM-VINDO DE VOLTA!</h1>
+                    <p>Minha Loja • <span id="currentUserDisplay">Thiago Ribeiro</span></p>
+                </div>
+                <button class="edit-profile-btn" onclick="alert('Editar Perfil (Em Breve)')">✏️ Editar Perfil</button>
+            </header>
+
+            <!-- Hero Action -->
+            <div class="hero-create-card" id="createPosterBtn">
+                <div class="hero-content">
+                    <div class="hero-icon">✨</div>
+                    <div class="hero-text">
+                        <h2>Criar Novo Cartaz</h2>
+                        <p>Comece a gerar seus cartazes profissionais</p>
+                    </div>
+                </div>
+                <button class="hero-cta">+ Criar Agora</button>
+            </div>
+
+            <!-- Action Grid -->
+            <div class="section-title">
+                <div class="icon-circle">🚀</div>
+                <div class="text">
+                    <h3>O que você quer fazer agora?</h3>
+                    <p>Escolha uma ação para começar</p>
+                </div>
+            </div>
+
+            <div class="action-grid">
+                <div class="action-card green" onclick="document.getElementById('createPosterBtn').click()">
+                    <div class="card-icon-overlay">🏷️</div>
+                    <h3>Cartaz de Oferta</h3>
+                    <p>Promoções e descontos</p>
+                </div>
+                <div class="action-card blue" onclick="document.getElementById('createPosterBtn').click()">
+                    <div class="card-icon-overlay">%</div>
+                    <h3>LEVE / PAGUE</h3>
+                    <p>Ofertas tipo leve 3 pague 2</p>
+                </div>
+                <div class="action-card purple" onclick="document.getElementById('createPosterBtn').click()">
+                    <div class="card-icon-overlay">👥</div>
+                    <h3>Preço de Clube</h3>
+                    <p>Preço normal x preço clube</p>
+                </div>
+                <div class="action-card orange" onclick="alert('Templates (Em Breve)')">
+                    <div class="card-icon-overlay">🔲</div>
+                    <h3>Ver Templates</h3>
+                    <p>Escolha um modelo</p>
+                </div>
+            </div>
+
+            <!-- Plan Status -->
+            <div class="plan-status-card">
+                <div class="plan-info">
+                    <div class="plan-icon">👑</div>
+                    <div class="plan-details">
+                        <div class="plan-header">
+                            <h3 id="dashboardPlanName">Plano Gratuito</h3>
+                            <span class="tag-status">Sem assinatura</span>
+                        </div>
+                        <p>Faça upgrade para criar mais cartazes</p>
+                    </div>
+                    <button class="upgrade-btn">Fazer Upgrade ↗</button>
+                </div>
+                <div class="plan-usage">
+                    <div class="usage-label">
+                        <span>Cartazes este mês</span>
+                        <span id="dashboardPlanLimit">Restam <b>5</b> de 5</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div id="dashboardPlanProgress" class="progress-fill" style="width: 0%"></div>
+                    </div>
+                    <div class="usage-footer">
+                        ⏱️ Limite reseta em 30 dias
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Row -->
+            <div class="stats-row">
+                <div class="stat-box cyan">
+                    <div class="stat-icon-s">📄</div>
+                    <div class="stat-data">
+                        <h3 id="statsUserCount">3</h3> <!-- Mocked as Total Cartazes -->
+                        <p>Total de Cartazes</p>
+                    </div>
+                    <div class="stat-link">Clique para ver todos →</div>
+                </div>
+                <div class="stat-box blue">
+                    <div class="stat-icon-s">📅</div>
+                    <div class="stat-data">
+                        <h3>0</h3>
+                        <p>Criados Hoje</p>
+                    </div>
+                    <div class="stat-link">Clique para filtrar por hoje →</div>
+                </div>
+                <div class="stat-box indigo">
+                    <div class="stat-icon-s">🗓️</div>
+                    <div class="stat-data">
+                        <h3>3</h3>
+                        <p>Esta Semana</p>
+                    </div>
+                    <div class="stat-link">Clique para filtrar por semana →</div>
+                </div>
+            </div>
+
+            <!-- Bottom Section (Chart & List) -->
+            <div class="dashboard-bottom-grid">
+                <!-- Chart Placeholder -->
+                <div class="chart-card">
+                    <div class="card-header">
+                        <div class="icon-circle small">📊</div>
+                        <div>
+                            <h3>Últimos 7 Dias</h3>
+                            <p>Clique em um dia para filtrar</p>
+                        </div>
+                        <span class="chart-total">📈 3 total</span>
+                    </div>
+                    <div class="chart-area"
+                        style="height: 150px; display: flex; align-items: flex-end; justify-content: space-between; padding-top: 20px;">
+                        <!-- Very simple CSS Bar Chart -->
+                        <div class="bar-group">
+                            <div class="bar" style="height: 0%"></div><span>Sáb</span>
+                        </div>
+                        <div class="bar-group">
+                            <div class="bar" style="height: 0%"></div><span>Dom</span>
+                        </div>
+                        <div class="bar-group">
+                            <div class="bar" style="height: 0%"></div><span>Seg</span>
+                        </div>
+                        <div class="bar-group">
+                            <div class="bar" style="height: 0%"></div><span>Ter</span>
+                        </div>
+                        <div class="bar-group">
+                            <div class="bar" style="height: 0%"></div><span>Qua</span>
+                        </div>
+                        <div class="bar-group">
+                            <div class="bar active" style="height: 60%"></div><span>Qui</span>
+                        </div>
+                        <div class="bar-group">
+                            <div class="bar" style="height: 0%"></div><span>Sex</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent List -->
+                <div class="recent-list-card">
+                    <div class="card-header">
+                        <div class="icon-circle small">📄</div>
+                        <div>
+                            <h3>Cartazes Recentes</h3>
+                            <p>Últimas gerações</p>
+                        </div>
+                        <a href="#" class="view-all-link">Ver Todos ></a>
+                    </div>
+                    <div class="recent-items">
+                        <div class="recent-item">
+                            <div class="item-icon">📄</div>
+                            <div class="item-info">
+                                <h4>Cartaz - 08/01/2026, 07:30 <span class="tag">Oferta</span></h4>
+                                <p>08/01 às 07:30 • 1 cartaz • A4</p>
+                            </div>
+                        </div>
+                        <div class="recent-item">
+                            <div class="item-icon">📄</div>
+                            <div class="item-info">
+                                <h4>Cartaz - 08/01/2026, 07:27 <span class="tag">Oferta</span></h4>
+                                <p>08/01 às 07:27 • 1 cartaz • A4</p>
+                            </div>
+                        </div>
+                        <div class="recent-item">
+                            <div class="item-icon">📄</div>
+                            <div class="item-info">
+                                <h4>Cartaz - 08/01/2026, 07:25 <span class="tag">Oferta</span></h4>
+                                <p>08/01 às 07:25 • 1 cartaz • A4</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tip Banner -->
+            <div class="tip-banner">
+                <div class="tip-icon">💡</div>
+                <div class="tip-content">
+                    <h4>DICA DO CARTAZISTA</h4>
+                    <h3>Renove seus cartazes</h3>
+                    <p>Troque os cartazes semanalmente para manter a loja sempre com cara de novidade.</p>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- Hidden elements to keep JS working if needed, or we refactor JS -->
+        <div style="display:none">
+            <button id="logoutBtn" class="logout-btn">Sair</button>
+            <div id="userTableBody"></div>
+        </div>
     </div>
 
     <!-- APP VIEW (The Editor) -->
     <div id="appView" class="view hidden">
         <div class="app-navbar">
-            <button id="backToDashBtn" class="nav-btn hidden">🔙 Painel</button>
+            <button id="backToDashBtn" class="nav-btn">⬅ Menu Principal</button>
+            <span style="flex:1"></span>
             <button id="appLogoutBtn" class="nav-btn" style="background-color: #c0392b;">Sair 🚪</button>
-            <span>Editor de Cartazes</span>
+            <span style="margin-left: 15px; font-weight: bold;">Editor de Cartazes</span>
         </div>
         <div class="app-container">
             <!-- Sidebar Controls -->
@@ -320,12 +562,14 @@
                         </select>
                     </label>
                     <div class="action-buttons">
-                        <button onclick="downloadPDF()" class="pdf-btn" id="btnDownloadPdf">
-                            BAIXAR PDF 📥
-                        </button>
-                        <button onclick="window.print()" class="print-btn">
-                            IMPRIMIR 🖨️
-                        </button>
+                        <div class="action-buttons">
+                            <button id="btnDownloadPdf" class="pdf-btn">
+                                BAIXAR PDF 📥
+                            </button>
+                            <button id="btnPrint" class="print-btn">
+                                IMPRIMIR 🖨️
+                            </button>
+                        </div>
                     </div>
                 </div>
                 <!-- Duplicate button removed -->

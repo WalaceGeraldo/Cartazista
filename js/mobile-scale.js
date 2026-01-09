@@ -1,3 +1,6 @@
+
+import { incrementGlobalPosterCount } from './stats.js';
+
 // Scale Management
 export function updatePreviewScale() {
     const previewArea = document.querySelector('.preview-area');
@@ -43,10 +46,7 @@ export function updatePreviewScale() {
     // Add vertical centering
     const scaledHeight = naturalHeight * scale;
     const verticalGap = (availableHeight - scaledHeight) / 2;
-    // We add padTop to the margin to position it relative to the container's top edge properly
-    // if using transformOrigin top center. The 'padTop' is already "space" in the flow, 
-    // but transform doesn't move it down.
-    // Actually, marginTop pushes it down.
+
     if (verticalGap > 0) {
         printContainer.style.marginTop = `${verticalGap}px`;
     } else {
@@ -54,8 +54,6 @@ export function updatePreviewScale() {
     }
 
     // NEW: Remove the empty space below caused by scaling
-    // The element takes up 'naturalHeight' in flow, but looks like 'scaledHeight'.
-    // We remove the difference so the next element (slider) comes up.
     const hiddenGap = naturalHeight - scaledHeight;
     printContainer.style.marginBottom = `-${hiddenGap}px`;
 }
@@ -66,4 +64,15 @@ export function initMobileScale() {
     window.addEventListener('load', updatePreviewScale);
     setTimeout(updatePreviewScale, 100);
     setTimeout(updatePreviewScale, 500);
+    setTimeout(updatePreviewScale, 1000);
+
+    // Initial calculation
+    updatePreviewScale();
 }
+
+// Hook into print to count posters
+const originalPrint = window.print;
+window.print = function () {
+    incrementGlobalPosterCount();
+    originalPrint();
+};

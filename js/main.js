@@ -1,6 +1,6 @@
 
 import { loadFromStorage, subscribe } from './state.js';
-import { logout, login, saveUser } from './auth.js';
+import { logout, login, saveUser, checkPrintQuota, consumePrintQuota, getSession, PLANS } from './auth.js';
 import { initEditor } from './editor.js';
 import { initMobileScale, updatePreviewScale } from './mobile-scale.js';
 
@@ -38,10 +38,40 @@ function checkAuthAndRedirect() {
         // Let's keep it: Login -> Dashboard (if admin) or App (if user)
         const user = JSON.parse(session);
         if (user.role === 'admin') {
-            showView('dashboard');
+            showView('adminDashboard');
             renderDashboardRPC(); // Helper to render dashboard
         } else {
-            showView('app');
+            showView('userDashboard');
+            // Populate user name in user dashboard
+            showView('userDashboard');
+            // Populate user name in user dashboard
+            const userDisplay = document.getElementById('currentUserDisplay');
+            if (userDisplay) userDisplay.innerText = user.name;
+
+            // Update Avatar Initials
+            const initials = user.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+            const avatars = document.querySelectorAll('.user-avatar-circle, .user-avatar-large');
+            avatars.forEach(el => el.innerText = initials);
+
+            // Update Plan Pill & Card
+            const planKey = user.plan || 'free';
+            const planData = PLANS[planKey] || PLANS['free'];
+            const limit = planData.limit;
+            const used = user.printsCount || 0;
+            const remaining = Math.max(0, limit - used);
+            const pct = Math.min(100, (used / limit) * 100);
+
+            const planPill = document.querySelector('.user-pill span');
+            if (planPill) planPill.innerText = `👤 ${planData.label}`;
+
+            const dName = document.getElementById('dashboardPlanName');
+            if (dName) dName.innerText = planData.label;
+
+            const dLimit = document.getElementById('dashboardPlanLimit');
+            if (dLimit) dLimit.innerHTML = `Restam <b>${remaining}</b> de ${limit}`;
+
+            const dProg = document.getElementById('dashboardPlanProgress');
+            if (dProg) dProg.style.width = `${pct}%`;
         }
     } else {
         showView('login');
@@ -65,14 +95,18 @@ function initAuthListeners() {
         showView('login');
     });
 
+    document.getElementById('adminLogoutBtn')?.addEventListener('click', () => {
+        logout();
+        showView('login');
+    });
+
     document.getElementById('appLogoutBtn')?.addEventListener('click', () => {
         logout();
         showView('login');
     });
 
     document.getElementById('backToDashBtn')?.addEventListener('click', () => {
-        showView('dashboard');
-        renderDashboardRPC();
+        checkAuthAndRedirect();
     });
 
     document.getElementById('createPosterBtn')?.addEventListener('click', () => {
@@ -85,6 +119,37 @@ function initAuthListeners() {
         app.classList.toggle('collapsed');
         e.target.innerText = app.classList.contains('collapsed') ? '▶' : '◀';
         setTimeout(updatePreviewScale, 305);
+    });
+
+    // --- Printing & Quota ---
+    const handleQuotaAction = (actionCallback) => {
+        const session = getSession();
+        if (!session) {
+            alert('Você precisa estar logado.');
+            return;
+        }
+
+        if (checkPrintQuota(session.id)) {
+            consumePrintQuota(session.id);
+            actionCallback();
+        } else {
+            alert('Limite de impressões do seu plano atingido! 🛑\n\nAtualize seu plano para continuar imprimindo.');
+        }
+    };
+
+    document.getElementById('btnDownloadPdf')?.addEventListener('click', () => {
+        handleQuotaAction(() => {
+            // Assuming downloadPDF is global or we need to import it. 
+            // It was likely defined separately. Ideally we import it.
+            // For now, if it was global, window.downloadPDF works.
+            if (window.downloadPDF) window.downloadPDF();
+        });
+    });
+
+    document.getElementById('btnPrint')?.addEventListener('click', () => {
+        handleQuotaAction(() => {
+            window.print();
+        });
     });
 
     // --- User Management ---
@@ -119,52 +184,141 @@ function initAuthListeners() {
     });
 }
 
-// Simple Dashboard Renderer (Migrated from script.js)
 // In a real app this would be its own module 'dashboard.js'
 function renderDashboardRPC() {
-    const userDisplay = document.getElementById('currentUserDisplay');
-    const session = JSON.parse(localStorage.getItem('cartazista_session') || '{}');
-    if (userDisplay) userDisplay.innerText = session.name || 'Admin';
+    // 1. Render Global Stats
+    import('./stats.js').then(({ getGlobalStats }) => {
+        const stats = getGlobalStats();
+        // Only run if elements exist (Admin View)
+        const totalel = document.getElementById('statTotalPosters');
+        if (totalel) totalel.innerText = stats.totalPosters || 0;
+    });
 
-    // Stats and User Table...
-    // For now, just ensuring navigation works. 
-    // If user wants full dashboard features preserved, we should port 'renderDashboard' fully.
-    // I'll leave it as a placeholder for now or copy the basic logic if requested.
-    // Given scope "do all", I should probably implement it properly.
-
-    import('./auth.js').then(({ getUsers, deleteUser }) => {
+    import('./auth.js').then(({ getUsers, deleteUser, updateUser, PLANS }) => {
         const users = getUsers();
-        document.getElementById('statsUserCount').innerText = users.length;
+        const statUsers = document.getElementById('statTotalUsers');
+        if (statUsers) statUsers.innerText = users.length;
 
         const tbody = document.getElementById('userTableBody');
+        const searchInput = document.getElementById('userSearchInput');
+
         if (!tbody) return;
-        tbody.innerHTML = '';
 
-        users.forEach(u => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${u.name}</td>
-                <td>${u.email}</td>
-                <td style="text-align:right">
-                    ${u.role !== 'admin' ? `<button class="text-btn-danger delete-btn" data-id="${u.id}" title="Excluir">🗑️</button>` : ''}
-                </td>
-            `;
-            tbody.appendChild(tr);
-        });
+        // Render Function
+        const renderTable = (filterText = '') => {
+            tbody.innerHTML = '';
+            const filtered = users.filter(u =>
+                u.name.toLowerCase().includes(filterText.toLowerCase()) ||
+                u.email.toLowerCase().includes(filterText.toLowerCase())
+            );
 
-        // Attach Delete Listeners
-        tbody.querySelectorAll('.delete-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                if (confirm('Tem certeza que deseja remover este usuário?')) {
-                    const id = parseInt(e.target.dataset.id);
-                    const res = deleteUser(id);
-                    if (res.success) {
-                        renderDashboardRPC(); // Refresh
-                    } else {
-                        alert(res.message);
-                    }
-                }
+            filtered.forEach(u => {
+                // Mapping
+                const planKey = u.plan || (u.role === 'admin' ? 'pro' : 'free');
+                const planLabel = PLANS[planKey]?.label || 'Gratuito';
+
+                const tr = document.createElement('tr');
+                tr.style.borderBottom = '1px solid #333';
+                tr.innerHTML = `
+                    <td style="padding: 12px; color: #f0f0f0;">${u.name}</td>
+                    <td style="padding: 12px; color: #ccc;">${u.email}</td>
+                     <td style="padding: 12px; color: #ccc;">${planLabel}</td>
+                    <td style="padding: 12px; text-align:right;">
+                        <button class="edit-btn" data-id="${u.id}" style="margin-right: 10px; border:none; background:none; cursor:pointer; font-size: 1.2rem;" title="Editar">✏️</button>
+                        ${u.role !== 'admin' ? `<button class="delete-btn" data-id="${u.id}" style="border:none; background:none; cursor:pointer; font-size: 1.2rem;" title="Excluir">🗑️</button>` : ''}
+                    </td>
+                `;
+                tbody.appendChild(tr);
             });
-        });
+
+            // Re-attach listeners
+            attachActionListeners();
+        };
+
+        const attachActionListeners = () => {
+            // Delete
+            tbody.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    // Prevent multiple clicks
+                    e.stopPropagation();
+                    if (confirm('Tem certeza que deseja remover este usuário?')) {
+                        const id = parseInt(btn.dataset.id); // Use btn.dataset directly
+                        const res = deleteUser(id);
+                        if (res.success) {
+                            renderDashboardRPC();
+                        } else {
+                            alert(res.message);
+                        }
+                    }
+                });
+            });
+
+            // Edit
+            tbody.querySelectorAll('.edit-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const id = parseInt(btn.dataset.id);
+                    const userToEdit = users.find(u => u.id === id);
+                    if (userToEdit) {
+                        openEditModal(userToEdit);
+                    }
+                });
+            });
+        };
+
+        // Initial Render
+        renderTable();
+
+        // Search Listener
+        if (searchInput) {
+            // Remove old listener to prevent duplicates (simple way: clone node or just direct assignment logic if careful)
+            // For RPC style, we just re-assign.
+            searchInput.onkeyup = (e) => {
+                renderTable(e.target.value);
+            };
+        }
+
+        // --- Edit Modal Logic ---
+        const editModal = document.getElementById('editUserModal');
+        const confirmEditBtn = document.getElementById('confirmEditEditBtn') || document.getElementById('confirmEditUserBtn'); // ID might be tricky check HTML
+
+        function openEditModal(user) {
+            if (!editModal) return;
+            document.getElementById('editUserId').value = user.id;
+            document.getElementById('editUserName').value = user.name;
+            document.getElementById('editUserEmail').value = user.email;
+            document.getElementById('editUserPlan').value = user.plan || 'free';
+            document.getElementById('editUserPass').value = ''; // Don't show pass
+            editModal.classList.remove('hidden');
+        }
+
+        // Bind Edit Modal Buttons (Only once preferably, but here inside render is okay if we use ID checks)
+        // A better place is initAuthListeners, but updateUser is imported here.
+        // Let's bind it here but safeguard against multiple bindings? 
+        // Actually, let's move the bind to `initAuthListeners` and expose `updateUser` or keep it here and use `onclick` to avoid stack.
+
+        const closeEditBtn = document.getElementById('cancelEditUserBtn');
+        if (closeEditBtn) closeEditBtn.onclick = () => editModal.classList.add('hidden');
+
+        if (confirmEditBtn) confirmEditBtn.onclick = () => {
+            const id = parseInt(document.getElementById('editUserId').value);
+            const name = document.getElementById('editUserName').value;
+            const email = document.getElementById('editUserEmail').value;
+            const plan = document.getElementById('editUserPlan').value;
+            const pass = document.getElementById('editUserPass').value;
+
+            const newData = { name, email, plan };
+            if (pass) newData.pass = pass;
+
+            const res = updateUser(id, newData);
+            if (res.success) {
+                alert('Usuário atualizado!');
+                editModal.classList.add('hidden');
+                renderDashboardRPC();
+            } else {
+                alert(res.message);
+            }
+        };
+
     });
 }

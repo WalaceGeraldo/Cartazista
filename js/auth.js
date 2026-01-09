@@ -6,7 +6,15 @@ const DEFAULT_ADMIN = {
     name: 'Administrador',
     email: 'admin@admin.com',
     pass: 'admin',
-    role: 'admin'
+    role: 'admin',
+    plan: 'pro',
+    printsCount: 0
+};
+
+export const PLANS = {
+    free: { label: 'Gratuito', limit: 5 },
+    basic: { label: 'Básico', limit: 25 },
+    pro: { label: 'Pro', limit: 100 }
 };
 
 export function getUsers() {
@@ -31,7 +39,9 @@ export function saveUser(name, email, pass) {
         name: name,
         email: email,
         pass: pass,
-        role: 'user'
+        role: 'user',
+        plan: 'free',
+        printsCount: 0
     };
 
     users.push(newUser);
@@ -49,6 +59,55 @@ export function deleteUser(id) {
     users = users.filter(u => u.id !== id);
     localStorage.setItem('cartazista_users', JSON.stringify(users));
     return { success: true };
+}
+
+export function updateUser(id, newData) {
+    const users = getUsers();
+    const index = users.findIndex(u => u.id === id);
+    if (index === -1) return { success: false, message: 'Usuário não encontrado.' };
+
+    // Prevent duplicate email if changing email
+    if (newData.email && newData.email !== users[index].email) {
+        if (users.find(u => u.email === newData.email)) {
+            return { success: false, message: 'E-mail já está em uso.' };
+        }
+    }
+
+    users[index] = { ...users[index], ...newData };
+    localStorage.setItem('cartazista_users', JSON.stringify(users));
+    return { success: true };
+}
+
+export function checkPrintQuota(userId) {
+    const users = getUsers();
+    const user = users.find(u => u.id === userId);
+    if (!user) return false;
+    if (user.role === 'admin') return true; // Admin has invalid
+
+    const plan = PLANS[user.plan || 'free'];
+    // Allow if count is less than limit
+    return (user.printsCount || 0) < plan.limit;
+}
+
+export function consumePrintQuota(userId) {
+    const users = getUsers();
+    const index = users.findIndex(u => u.id === userId);
+    if (index === -1) return false;
+
+    const user = users[index];
+    if (user.role !== 'admin') {
+        user.printsCount = (user.printsCount || 0) + 1;
+        users[index] = user;
+        localStorage.setItem('cartazista_users', JSON.stringify(users));
+
+        // Update session if it's the current user
+        const session = getSession();
+        if (session && session.id === userId) {
+            session.printsCount = user.printsCount;
+            localStorage.setItem('cartazista_session', JSON.stringify(session));
+        }
+    }
+    return true;
 }
 
 export function login(email, password) {
