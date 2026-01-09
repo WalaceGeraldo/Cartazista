@@ -125,7 +125,7 @@ body {
 }
 
 /* Fix Scroll for User Dashboard */
-#userDashboard {
+#userDashboardView {
     height: 100vh;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
