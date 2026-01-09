@@ -4,12 +4,17 @@
 }
 
 :root {
-    --bg-color: #1e1e1e;
-    --sidebar-bg: #252526;
-    --text-color: #ffffff;
-    --accent-color: #007acc;
-    --border-color: #3e3e42;
-    --input-bg: #333333;
+    --bg-color: #0d0d0d;
+    --sidebar-bg: rgba(28, 28, 30, 0.75);
+    --sidebar-border: rgba(255, 255, 255, 0.1);
+    --text-color: #f5f5f7;
+    --secondary-text: #86868b;
+    --accent-color: #2979ff;
+    --accent-hover: #1c54b2;
+    --danger-color: #ff453a;
+    --input-bg: rgba(255, 255, 255, 0.05);
+    --input-focus-bg: rgba(255, 255, 255, 0.1);
+    --card-bg: #1c1c1e;
 
     /* Poster Variables */
     --poster-font-main: 'Oferta do Dia', 'Anton', sans-serif;
@@ -25,223 +30,262 @@
 }
 
 body {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     background-color: var(--bg-color);
+    background-image: radial-gradient(circle at 50% 50%, #1a1a1a 0%, #0d0d0d 100%);
     color: var(--text-color);
+    height: 100vh;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* --- LAYOUT --- */
+/* --- LAYOUT --- */
+#appView {
+    display: flex;
+    flex-direction: column;
     height: 100vh;
     overflow: hidden;
 }
 
 .app-container {
     display: flex;
-    height: 100vh;
+    flex: 1;
+    /* Take remaining height after navbar */
     position: relative;
-    /* Anchor for absolute elements */
+    overflow: hidden;
 }
 
-/* Sidebar */
+/* Sidebar "Glass" Design */
 .sidebar {
     width: 320px;
     background-color: var(--sidebar-bg);
-    padding: 20px;
-    border-right: 1px solid var(--border-color);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-right: 1px solid var(--sidebar-border);
+    padding: 24px;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 24px;
     overflow-y: auto;
-    transition: margin-left 0.3s ease, height 0.3s ease;
-    /* Smooth transitions */
+    padding-bottom: 50px;
+    /* Ensure bottom buttons are reachable */
+    transition: margin-left 0.4s cubic-bezier(0.25, 1, 0.5, 1);
     z-index: 20;
-    /* Below toggle */
 }
 
 .logo h1 {
     font-size: 1.5rem;
-    color: var(--accent-color);
-    margin-bottom: 10px;
+    font-weight: 700;
+    background: linear-gradient(90deg, #fff, #aaa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.5px;
+    margin-bottom: 0px;
 }
 
+.logo span {
+    /* 'Editor' badge or similar if added */
+    font-size: 0.8rem;
+    color: var(--accent-color);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Controls */
 .control-group {
-    background: #2d2d30;
-    padding: 15px;
-    border-radius: 8px;
-    border: 1px solid var(--border-color);
+    background: transparent;
+    padding: 0;
+    border: none;
+    border-radius: 0;
 }
 
 .control-group h3 {
-    font-size: 0.9rem;
+    font-size: 0.75rem;
+    font-weight: 600;
     text-transform: uppercase;
-    color: #888;
-    margin-bottom: 15px;
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 5px;
+    color: var(--secondary-text);
+    margin-bottom: 12px;
+    letter-spacing: 0.5px;
 }
 
 label {
     display: block;
-    margin-bottom: 12px;
+    margin-bottom: 16px;
 }
 
 label span {
     display: block;
-    font-size: 0.8rem;
-    margin-bottom: 5px;
+    font-size: 0.85rem;
+    margin-bottom: 6px;
     color: #ccc;
+    font-weight: 500;
 }
 
+/* Modern Inputs */
 input[type="text"],
+input[type="number"],
+input[type="email"],
+input[type="password"],
 select {
     width: 100%;
-    padding: 8px;
-    border-radius: 4px;
-    border: 1px solid var(--border-color);
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid transparent;
     background: var(--input-bg);
     color: white;
     font-family: inherit;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+}
+
+input:focus,
+select:focus {
+    background: var(--input-focus-bg);
+    border-color: var(--accent-color);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(41, 121, 255, 0.2);
+}
+
+/* Fix dropdown option visibility */
+select option {
+    background-color: #1c1c1e;
+    /* Dark background */
+    color: white;
+    /* White text */
 }
 
 .price-row {
     display: flex;
-    gap: 10px;
+    gap: 12px;
 }
 
-.toggle-switch {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+/* Buttons */
+button {
+    font-family: inherit;
     cursor: pointer;
+    transition: all 0.2s ease;
 }
 
-/* Action Buttons */
-.action-buttons {
-    display: flex;
-    gap: 10px;
-    margin-top: 15px;
-}
-
+.primary-btn,
 .print-btn,
 .pdf-btn {
-    flex: 1;
-    border: none;
-    padding: 15px;
-    font-size: 0.9rem;
-    font-weight: bold;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: filter 0.2s;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
-}
-
-.print-btn {
-    background-color: var(--accent-color);
-}
-
-.pdf-btn {
-    background-color: #e74c3c;
-    /* Red for PDF */
-}
-
-.print-btn:hover,
-.pdf-btn:hover {
-    filter: brightness(1.1);
-}
-
-/* Toggle Button */
-.sidebar-toggle {
-    display: none;
-    /* Hidden by default (Desktop) */
-    /* Base styles for when it is shown (Mobile) */
-    position: fixed;
-    /* Fixed to viewport */
     background: var(--accent-color);
     color: white;
     border: none;
-    cursor: pointer;
-    user-select: none;
-    /* Prevent text selection while dragging */
-    touch-action: none;
-    /* Prevent scroll on touch */
-    z-index: 1000;
-    /* Float above others */
-    align-items: center;
-    justify-content: center;
-    font-size: 1.2rem;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+.primary-btn:hover,
+.print-btn:hover,
+.pdf-btn:hover {
+    background: var(--accent-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
 }
 
-::-webkit-scrollbar-track {
-    background: #1e1e1e;
-}
-
-::-webkit-scrollbar-thumb {
-    background: #444;
-    border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: #555;
-}
-
-/* Ensure inputs match theme */
-input[type="number"] {
-    width: 100%;
-    padding: 8px;
-    border-radius: 4px;
-    border: 1px solid var(--border-color);
+.secondary-btn {
     background: var(--input-bg);
+    color: var(--text-color);
+    border: 1px solid var(--sidebar-border);
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+}
+
+.secondary-btn:hover {
+    background: var(--input-focus-bg);
+}
+
+.logout-btn {
+    background: transparent;
+    color: var(--secondary-text);
+    border: none;
+    font-size: 0.9rem;
+}
+
+.logout-btn:hover {
+    color: var(--danger-color);
+}
+
+/* Action Grid */
+.action-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+#loginBtn {
+    background: var(--accent-color);
     color: white;
-    font-family: inherit;
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: 600;
+    margin-top: 10px;
+    width: 100%;
 }
 
-/* Collapsed State - Desktop */
-.app-container.collapsed .sidebar {
-    margin-left: -320px;
+#loginBtn:hover {
+    background: var(--accent-hover);
 }
 
-.app-container.collapsed .sidebar-toggle {
-    left: 0;
+.pdf-btn {
+    background: #ff3b30;
 }
 
-.app-container.collapsed .sidebar-toggle::before {
-    content: "▶";
+.pdf-btn:hover {
+    background: #d32f2f;
 }
+
+/* Sidebar Toggle */
+.sidebar-toggle {
+    display: none;
+    /* Desktop default */
+    background: var(--card-bg);
+    color: white;
+    border: 1px solid var(--sidebar-border);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    /* Mobile specific styles applied in media query */
+}
+
 
 /* Preview Area */
 .preview-area {
     flex: 1;
-    background-color: #121212;
     display: flex;
     justify-content: center;
-    align-items: center;
-    padding: 10px;
-    overflow: hidden;
-    /* Force scale to handle fitting */
+    align-items: flex-start;
+    /* Changed from center to allow top padding */
+    padding: 40px;
+    overflow: auto;
+    background: radial-gradient(circle at center, #1e1e1e 0%, #000 100%);
+    position: relative;
+    /* Dot pattern overlay */
+    background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    background-size: 20px 20px;
 }
 
-/* Print Container (The Paper) */
 #printContainer {
     background: white;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-    display: grid;
-    /* Aspect ratios will be handled via classes */
-    width: 210mm;
-    /* A4 Defaults */
-    height: 297mm;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    transition: transform 0.1s linear;
+    /* Smooth drag */
+    /* Ensure page break */
     page-break-after: always;
-    /* Safety */
-    overflow: hidden;
 }
 
-/* Grid Layouts inside Paper */
+/* ... Keep existing layout/poster classes logic, basically unchanged ... */
+.print-container {
+    display: grid;
+    /* Grid Defs */
+}
+
 .layout-1 {
     grid-template-columns: 1fr;
     grid-template-rows: 1fr;
@@ -262,7 +306,7 @@ input[type="number"] {
     grid-template-rows: repeat(4, 1fr);
 }
 
-/* Paper Sizes (approximate screen representation) */
+/* Paper Sizes */
 .paper-a4 {
     width: 210mm;
     height: 297mm;
@@ -283,15 +327,12 @@ input[type="number"] {
     height: 279mm;
 }
 
-/* 8.5 x 11 in */
 .paper-legal {
     width: 216mm;
     height: 356mm;
 }
 
-/* 8.5 x 14 in */
-
-/* Orientation Overrides (swap width/height) */
+/* Landscape overrides */
 .paper-a4.landscape {
     width: 297mm;
     height: 210mm;
@@ -317,721 +358,528 @@ input[type="number"] {
     height: 216mm;
 }
 
-/* 
-   Note: Dynamic @page rules in script.js handle the actual print output size 
-   regardless of these visual preview dimensions.
-*/
-
-/* The Poster Card Itself */
+/* Poster Content */
 .poster-card {
     position: relative;
-    border: 1px dashed #ddd;
-    /* Helper guide for cutting */
+    border: 1px dashed rgba(0, 0, 0, 0.1);
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
 }
 
-.vector-bg {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 90%;
-    height: 90%;
-    background-image: url('imagens/1.png');
-    background-size: contain;
-    background-position: center;
-    background-repeat: no-repeat;
-    z-index: 1;
-    display: none;
-    /* Removed: using individual element backgrounds now */
-}
-
-/* Theme Vector Specifics */
-.poster-card.theme-vector .offer-label {
-    background-image: url('imagens/1.png');
-    background-size: 100% 100%;
-    background-repeat: no-repeat;
-    background-position: center;
-    padding: 0.2em 0.5em;
-    /* Breathing room for the splash */
-    z-index: 10;
-}
-
+.poster-card.theme-vector .offer-label,
 .poster-card.theme-vector .price-container {
     background-image: url('imagens/1.png');
     background-size: 100% 100%;
     background-repeat: no-repeat;
     background-position: center;
-    padding: 0.1em 0.3em;
-    z-index: 10;
+    padding: 0.2em 0.5em;
 }
 
 .content {
-    position: relative;
-    z-index: 2;
-    text-align: center;
-    width: 100%;
+    /* ... Font settings from old CSS ... */
     font-family: var(--poster-font-main);
     color: var(--poster-color-black);
     text-transform: uppercase;
+    text-align: center;
+    width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 100%;
 }
 
-/* Layout Specific Typography Variable Defaults */
-/* Default (1 Up - Landscape/Portrait Base) */
+/* Typography Defaults (Copying mapped vars from old CSS) */
 .print-container {
     --fs-offer: 5rem;
     --fs-name: 6rem;
     --fs-detail: 3rem;
     --fs-price: 9rem;
-
-    /* Vertical Scale Defaults */
     --scale-y-offer: 1;
     --scale-y-name: 1;
     --scale-y-detail: 1;
+    --scale-y-category: 1;
     --scale-y-price: 1;
 }
 
-/* 2 Up - Increase specificity to override base if needed, 
-   but since base is now .print-container (class), .layout-2 (class) 
-   should override by order if defined after, or equal specificity. 
-   Let's use ID just to be safe and crisp. */
-
-/* 2 Up */
-#printContainer.layout-2 {
+/* Layout overrides */
+.layout-2 {
     --fs-offer: 4rem;
     --fs-name: 4.5rem;
     --fs-detail: 2.5rem;
     --fs-price: 7rem;
 }
 
-/* 4 Up */
-#printContainer.layout-4 {
+.layout-4 {
     --fs-offer: 3rem;
     --fs-name: 3.5rem;
     --fs-category: 2.5rem;
     --fs-detail: 3rem;
-    --fs-price: 9rem;
-
-    /* Vertical Scale Defaults */
-    --scale-y-offer: 1;
-    --scale-y-name: 1;
-    --scale-y-category: 1;
-    --scale-y-detail: 1;
-    --scale-y-price: 1;
+    --fs-price: 5.5rem;
 }
 
-/* 8 Up */
-#printContainer.layout-8 {
+.layout-8 {
     --fs-offer: 2rem;
     --fs-name: 2.2rem;
     --fs-category: 1.8rem;
     --fs-detail: 1.4rem;
     --fs-price: 4rem;
-
-    /* Vertical Scale Defaults */
-    --scale-y-offer: 1;
-    --scale-y-name: 1;
-    --scale-y-category: 1;
-    --scale-y-detail: 1;
-    --scale-y-price: 1;
 }
 
+/* Element Styles */
 .offer-label {
     color: var(--poster-color-red);
     font-size: var(--fs-offer);
-    /* Increased from 3rem */
-    margin-bottom: 0.5rem;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.2rem;
     transform: rotate(-2deg) scaleY(var(--scale-y-offer));
-    transform-origin: center;
-    display: inline-block;
-    /* Required for transform */
 }
 
 .product-name {
     font-size: var(--fs-name);
     font-weight: 700;
-    line-height: 1.1;
+    line-height: 1;
     margin-bottom: 0.2rem;
     transform: scaleY(var(--scale-y-name));
-    transform-origin: bottom center;
-    display: inline-block;
-    /* Required for transform */
 }
 
 .product-category {
     font-size: var(--fs-category);
     font-weight: 600;
     margin-bottom: 0.2rem;
-    color: var(--poster-color-black);
     transform: scaleY(var(--scale-y-category));
-    transform-origin: bottom center;
-    display: inline-block;
 }
 
 .product-detail {
     font-size: var(--fs-detail);
-    /* Increased from 2rem */
-    margin-bottom: 0.5rem;
     transform: scaleY(var(--scale-y-detail));
-    transform-origin: bottom;
-    display: block;
+    margin-bottom: 0.5rem;
 }
 
 .price-container {
     color: var(--poster-color-red);
     font-size: var(--fs-price);
-    /* Increased from 6rem */
-    /* Increased from 6rem */
     line-height: 0.9;
     transform: scaleY(var(--scale-y-price));
-    transform-origin: bottom;
-    display: block;
+    display: inline-flex;
+    align-items: baseline;
+    justify-content: center;
 }
 
 .price-value {
     font-weight: bold;
 }
 
-
-/* Mobile Responsiveness */
-@media (max-width: 768px) {
-    body {
-        overflow: auto;
-        /* Allow scrolling on body for mobile */
-        height: auto;
-    }
-
-    .app-container {
-        flex-direction: column;
-        height: auto;
-    }
-
-    .sidebar {
-        width: 100%;
-        height: 100vh;
-        position: fixed;
-        top: 0;
-        left: 0;
-        z-index: 999;
-        /* Overlay content */
-        border-right: none;
-        border-bottom: 1px solid var(--border-color);
-        padding: 20px;
-        background-color: var(--sidebar-bg);
-        overflow-y: auto;
-        /* Allow menu scrolling */
-    }
-
-    /* Mobile Toggle Button */
-    .sidebar-toggle {
-        display: flex;
-        /* Show on mobile */
-        right: 0;
-        top: 0;
-        width: 48px;
-        height: 48px;
-        border-radius: 0 0 0 12px;
-        /* Docked corner look */
-        transform: none;
-        position: fixed;
-        box-shadow: -2px 2px 5px rgba(0, 0, 0, 0.3);
-        z-index: 1000;
-    }
-
-    /* Mobile Collapsed State */
-    .app-container.collapsed .sidebar {
-        margin-left: 0;
-        display: none;
-        /* Completely remove from flow */
-    }
-
-    .app-container.collapsed .sidebar-toggle {
-        left: auto;
-        right: 0;
-        /* Stay docked */
-    }
-
-    /* Removed gear icon override to keep arrows */
-
-    /* When expanded on mobile, show close or arrow down? */
-    /* JS sets InnerText. We might need to override it or use icons entirely. 
-       Let's use ::before content trick with empty InnerText for pure CSS icon switching if JS wasn't setting text.
-       But JS sets '▶' or '◀'. Let's trust JS for arrow, but maybe force a different icon here?
-       Actually, '◀' means 'Back/Hide'.
-       If we hide sidebar, we want 'Show'. '▶' might be confusing if it means 'Right'.
-       Let's stick to simple arrows but rotated: 
-       Expanded: ▲ (Hide)
-       Collapsed: ▼ (Show)
-       Or just use the JS logic. If collapsed on mobile, sidebar is gone. Arrow ▶ points right? 
-       Let's assume the user understands click to toggle.
-    */
-
-    .preview-area {
-        height: auto;
-        padding: 20px 10px;
-        overflow: hidden;
-        /* We'll scale the child instead of scrolling */
-        display: block;
-        /* Remove flex centering */
-    }
-
-    /* Scale the print container to fit mobile screen */
-    #printContainer {
-        /* Scaling handled by mobile_scale.js */
-        margin: 0 auto;
-    }
+.unit-value {
+    font-size: 0.4em;
 }
 
-@media print {
-    body {
-        background: white;
-        height: auto;
-        overflow: visible;
-    }
-
-    .sidebar,
-    .sidebar-toggle {
-        display: none !important;
-    }
-
-    .preview-area {
-        padding: 0;
-        height: auto;
-        overflow: visible;
-        background: white;
-        display: block;
-    }
-
-    #printContainer {
-        box-shadow: none;
-        margin: 0;
-        width: 100% !important;
-        height: 100vh;
-        transform: none !important;
-        /* Critical: Reset zoom/translate from preview */
-        transform-origin: 0 0 !important;
-    }
-
-    /* Remove dashed lines for final print if desired, or keep as guides */
-    .poster-card {
-        border: 1px solid #eee;
-        /* Faint guide */
-    }
-
-    /* Ensure background graphics print */
-    * {
-        -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
-    }
+.currency {
+    margin-right: 0.1em;
 }
 
-/* Draggable helper */
+/* Interactive States */
 .draggable {
     cursor: move;
-    position: relative;
-    user-select: none;
-    z-index: 1000;
-    transform-origin: center center;
-    /* Force center rotation */
 }
 
-.price-container {
-    display: inline-flex;
-    align-items: baseline;
-    /* Align text baselines */
-    justify-content: center;
-    white-space: nowrap;
-    /* Prevent wrapping */
-}
-
-.price-value {
-    display: inline-block;
-    vertical-align: middle;
-}
-
-
-/* Interactive Resizing Styles */
 .selected-element {
-    outline: 2px dashed #007bff;
-    /* Blue outline */
-    z-index: 1001;
+    outline: 2px dashed var(--accent-color);
+    z-index: 50;
 }
 
-/* Base Handle Style */
 .resize-handle {
-    width: 20px;
-    /* Increased from 12px for better touch target */
-    height: 20px;
-    background-color: #007bff;
+    width: 16px;
+    height: 16px;
+    background-color: var(--accent-color);
     border: 2px solid white;
     border-radius: 50%;
     position: absolute;
-    z-index: 1002;
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+    z-index: 51;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-/* Right Handle (Scale X) */
 .handle-e {
+    right: -8px;
     top: 50%;
-    right: -6px;
     transform: translateY(-50%);
+    cursor: ew-resize;
+}
+
+.handle-s {
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    cursor: ns-resize;
+}
+
+.handle-se {
+    right: -8px;
+    bottom: -8px;
     cursor: nwse-resize;
 }
 
 .handle-rot {
-    width: 24px;
-    height: 24px;
-    background-color: rgba(40, 167, 69, 0.8);
-    /* Semi-transparent green */
-    border: 2px solid white;
-    border-radius: 50%;
-    position: absolute;
-    top: 0;
-    /* Top */
-    left: auto;
-    /* Not center */
-    right: 0;
-    /* Right */
-    transform: translate(50%, -50%);
-    /* Offset to sit exactly on the corner tip */
-    cursor: grab;
-    /* Or specific rotation cursor */
-    z-index: 1002;
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
-    /* Icon for rotation? */
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    top: -24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #00c853;
+    cursor: url('data:image/svg+xml;utf8,<svg ...>'), auto;
+    /* Simple content icon */
 }
 
 .handle-rot::before {
     content: '↻';
-    /* Unicode refresh/rotate icon */
     color: white;
-    font-size: 16px;
-    line-height: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    font-size: 12px;
 }
 
-/* Connecting line removed */
-.handle-rot::after {
-    display: none;
-}
-
-/* Bottom Handle (Scale Y) */
-.handle-s {
-    bottom: -6px;
-    left: 50%;
-    transform: translateX(-50%);
-    cursor: s-resize;
-}
-
-/* Corner Handle (Scale XY) */
-.handle-se {
-    bottom: -6px;
-    right: -6px;
-    cursor: se-resize;
-}
-
-/* --- VIEW MANAGEMENT & NEW SCREENS --- */
-
-/* View Defaults */
-.view {
-    width: 100vw;
-    height: 100vh;
-    display: block;
-    /* Active state */
-    overflow: hidden;
-}
-
-.view.hidden {
-    display: none !important;
-}
-
-/* Generic Hidden Utility */
+/* Views */
 .hidden {
     display: none !important;
 }
 
-
-/* LOGIN SCREEN */
+/* Login View */
 #loginView {
-    background-color: var(--sidebar-bg);
     display: flex;
     align-items: center;
     justify-content: center;
+    height: 100vh;
+    background: linear-gradient(to bottom right, #0f2027, #203a43, #2c5364);
+    /* Deep teal/blue gradient */
+    position: relative;
+    overflow: hidden;
+}
+
+#loginView::before {
+    /* Abstract shapes background */
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, transparent 60%);
+    transform: rotate(30deg);
+    pointer-events: none;
 }
 
 .login-card {
-    background: #2a2a2a;
-    padding: 2rem;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    background: rgba(28, 28, 30, 0.8);
+    /* Glass effect */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 40px;
+    border-radius: 20px;
     width: 100%;
-    max-width: 400px;
+    max-width: 380px;
     text-align: center;
-    border: 1px solid var(--border-color);
-}
-
-.login-header h2 {
-    color: var(--accent-color);
-    margin-bottom: 0.5rem;
-    font-size: 2rem;
-}
-
-.login-header p {
-    color: #888;
-    margin-bottom: 2rem;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .login-form {
     display: flex;
     flex-direction: column;
-    gap: 15px;
-}
-
-.login-form input {
-    background: #1e1e1e;
-    border: 1px solid #444;
-    padding: 12px;
-    border-radius: 6px;
-    color: #fff;
-    font-size: 1rem;
-}
-
-.login-form input:focus {
-    border-color: var(--accent-color);
-    outline: none;
+    gap: 16px;
+    margin-top: 24px;
 }
 
 #loginBtn {
-    background: var(--accent-color);
+    background: linear-gradient(135deg, #007acc 0%, #005f9e 100%);
     color: white;
     border: none;
-    padding: 12px;
-    border-radius: 6px;
-    font-weight: bold;
-    cursor: pointer;
+    padding: 14px;
+    border-radius: 50px;
+    /* Pill shape */
+    font-weight: 700;
+    margin-top: 15px;
+    width: 100%;
     font-size: 1rem;
-    transition: filter 0.2s;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 122, 204, 0.4);
 }
 
 #loginBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 122, 204, 0.6);
     filter: brightness(1.1);
 }
 
-/* DASHBOARD SCREEN */
-#dashboardView {
-    background-color: #1e1e1e;
-    color: white;
-    display: flex;
-    flex-direction: column;
-    overflow-y: auto;
-    /* Allow native scrolling */
-    height: 100vh;
-}
-
-.dash-header {
-    background: #2a2a2a;
-    padding: 1rem 2rem;
+/* Editor Navbar */
+.app-navbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid var(--border-color);
+    background: rgba(28, 28, 30, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 12px 24px;
+    border-bottom: 1px solid var(--sidebar-border);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.app-navbar span {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: white;
+    letter-spacing: 0.5px;
+}
+
+.nav-btn {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid transparent;
+    padding: 8px 16px;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.nav-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-1px);
+}
+
+#appLogoutBtn {
+    background: rgba(255, 69, 58, 0.15) !important;
+    color: #ff453a !important;
+    border: 1px solid rgba(255, 69, 58, 0.3);
+}
+
+#appLogoutBtn:hover {
+    background: #ff453a !important;
+    color: white !important;
+    box-shadow: 0 4px 12px rgba(255, 69, 58, 0.4);
+}
+
+
+
+
+/* --- DASHBOARD VIEW --- */
+#dashboardView {
+    flex-direction: column;
+    height: 100vh;
+    background: radial-gradient(circle at 50% 50%, #1a1a1a 0%, #0d0d0d 100%);
+    overflow-y: auto;
+}
+
+.dash-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 40px;
+    background: rgba(28, 28, 30, 0.75);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--sidebar-border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
 }
 
 .dash-logo {
     font-size: 1.5rem;
-    font-weight: bold;
-    font-family: 'Anton', sans-serif;
+    font-weight: 800;
+    color: white;
 }
 
 .dash-logo span {
     color: var(--accent-color);
-    font-family: 'Inter', sans-serif;
-    font-size: 0.9rem;
-    margin-left: 5px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-.logout-btn {
-    background: transparent;
-    border: 1px solid #e74c3c;
-    color: #e74c3c;
-    padding: 5px 15px;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.logout-btn:hover {
-    background: #e74c3c;
-    color: white;
+    font-weight: 400;
 }
 
 .dash-content {
-    padding: 3rem;
+    padding: 40px;
     max-width: 1200px;
     margin: 0 auto;
     width: 100%;
 }
 
-.dash-content h1 {
-    margin-bottom: 2rem;
-    font-weight: 300;
+.dash-welcome {
+    margin-bottom: 40px;
+}
+
+.dash-welcome h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    background: linear-gradient(90deg, #fff, #aaa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.dash-welcome p {
+    color: var(--secondary-text);
+}
+
+/* Stats Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+.stat-card {
+    background: rgba(28, 28, 30, 0.6);
+    /* Glassy dark */
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--sidebar-border);
+    padding: 30px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--accent-color);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    background: rgba(41, 121, 255, 0.05);
+    /* Tint on hover */
+}
+
+.stat-icon {
+    font-size: 2.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    width: 70px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 16px;
+}
+
+.stat-info h3 {
+    font-size: 0.95rem;
+    color: var(--secondary-text);
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.stat-value {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: white;
+}
+
+/* Quick Actions & Dash Grid */
+h2 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: var(--text-color);
+    border-left: 4px solid var(--accent-color);
+    padding-left: 12px;
 }
 
 .dash-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 20px;
+    margin-bottom: 50px;
 }
 
 .dash-card {
-    background: #2a2a2a;
-    padding: 2rem;
-    border-radius: 12px;
+    background: var(--card-bg);
+    border: 1px solid var(--sidebar-border);
+    border-radius: 16px;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     text-align: center;
     cursor: pointer;
-    border: 1px solid transparent;
-    transition: transform 0.2s, border-color 0.2s;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    min-height: 160px;
 }
 
-.dash-card:hover {
-    transform: translateY(-5px);
-    border-color: var(--accent-color);
+.dash-card:not(.disabled):hover {
+    background: var(--accent-color);
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 10px 40px rgba(41, 121, 255, 0.3);
+    border-color: transparent;
+}
+
+.dash-card .card-icon {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+    transition: transform 0.3s ease;
+}
+
+.dash-card:hover .card-icon {
+    transform: scale(1.2) rotate(10deg);
+}
+
+.dash-card h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-color);
 }
 
 .dash-card.disabled {
     opacity: 0.5;
     cursor: not-allowed;
-    filter: grayscale(1);
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px dashed var(--sidebar-border);
 }
 
-.dash-card .card-icon {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-}
-
-/* APP VIEW NAVBAR */
-.app-navbar {
-    background: #2a2a2a;
-    padding: 10px 20px;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.nav-btn {
-    background: #444;
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.nav-btn:hover {
-    background: #555;
-}
-
-/* --- DASHBOARD EXTENSIONS (STATS & USERS) --- */
-
-.dash-welcome {
-    margin-bottom: 2rem;
-    color: #fff;
-}
-
-.dash-welcome h1 {
-    font-size: 2.5rem;
-    margin-bottom: 0.5rem;
-}
-
-.dash-welcome p {
-    color: #888;
-}
-
-/* Stats Row */
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 20px;
-    margin-bottom: 3rem;
-}
-
-.stat-card {
-    background: #2a2a2a;
-    padding: 1.5rem;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-    border: 1px solid var(--border-color);
-}
-
-.stat-icon {
-    font-size: 2.5rem;
-    background: rgba(255, 255, 255, 0.1);
-    width: 60px;
-    height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-}
-
-.stat-info h3 {
-    font-size: 0.9rem;
-    color: #888;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 5px;
-}
-
-.stat-value {
-    font-size: 2rem;
-    font-weight: bold;
-    color: var(--accent-color);
-}
-
-/* User Management Section */
+/* User Section & Table */
 .user-section {
-    margin-top: 3rem;
-    background: #2a2a2a;
-    border-radius: 12px;
-    padding: 1.5rem;
-    border: 1px solid var(--border-color);
+    background: var(--card-bg);
+    border: 1px solid var(--sidebar-border);
+    border-radius: 20px;
+    padding: 30px;
 }
 
 .section-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1.5rem;
+    margin-bottom: 24px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--sidebar-border);
+}
+
+.section-header h2 {
+    margin: 0;
+    border: none;
+    padding: 0;
 }
 
 .action-btn {
-    background: var(--accent-color);
-    color: white;
-    border: none;
+    background: rgba(41, 121, 255, 0.1);
+    color: var(--accent-color);
+    border: 1px solid var(--accent-color);
     padding: 8px 16px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: bold;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
 }
 
 .action-btn:hover {
-    filter: brightness(1.1);
+    background: var(--accent-color);
+    color: white;
 }
 
 .table-container {
@@ -1041,42 +889,33 @@ input[type="number"] {
 .user-table {
     width: 100%;
     border-collapse: collapse;
-    color: #ddd;
-}
-
-.user-table th,
-.user-table td {
-    padding: 12px;
-    text-align: left;
-    border-bottom: 1px solid #444;
 }
 
 .user-table th {
-    color: #888;
-    font-weight: normal;
-    text-transform: uppercase;
-    font-size: 0.8rem;
+    text-align: left;
+    color: var(--secondary-text);
+    font-weight: 600;
+    padding: 15px 20px;
+    font-size: 0.9rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.user-table tr:hover {
-    background: #333;
-}
-
-.delete-btn {
-    background: #e74c3c;
+.user-table td {
+    padding: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     color: white;
+    font-size: 0.95rem;
+}
+
+.user-table tr:last-child td {
     border: none;
-    padding: 4px 8px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.8rem;
 }
 
-.delete-btn:hover {
-    background: #c0392b;
+.user-table tr:hover td {
+    background: rgba(255, 255, 255, 0.02);
 }
 
-/* Modal */
+/* Modals */
 .modal {
     position: fixed;
     top: 0;
@@ -1084,114 +923,185 @@ input[type="number"] {
     width: 100%;
     height: 100%;
     background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(5px);
     display: flex;
-    align-items: center;
     justify-content: center;
-    z-index: 2000;
+    align-items: center;
+    z-index: 200;
+}
+
+.modal.hidden {
+    display: none;
 }
 
 .modal-content {
-    background: #2a2a2a;
-    padding: 2rem;
-    border-radius: 12px;
+    background: #1c1c1e;
+    padding: 40px;
+    border-radius: 20px;
+    border: 1px solid var(--sidebar-border);
     width: 100%;
-    max-width: 400px;
-    border: 1px solid var(--border-color);
+    max-width: 450px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    animation: modalPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-.modal-content h3 {
-    margin-bottom: 1.5rem;
-    text-align: center;
-    border-bottom: 1px solid #444;
-    padding-bottom: 1rem;
+@keyframes modalPop {
+    from {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
 }
 
 .modal-form {
     display: flex;
     flex-direction: column;
     gap: 15px;
-    margin-bottom: 1.5rem;
-}
-
-.modal-form input {
-    background: #1e1e1e;
-    border: 1px solid #444;
-    padding: 12px;
-    border-radius: 6px;
-    color: white;
+    margin: 25px 0;
 }
 
 .modal-actions {
     display: flex;
-    gap: 10px;
     justify-content: flex-end;
+    gap: 15px;
 }
 
-.primary-btn {
-    background: var(--accent-color);
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: bold;
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
 }
 
-.secondary-btn {
+::-webkit-scrollbar-track {
     background: transparent;
-    color: #aaa;
-    border: 1px solid #444;
-    padding: 10px 20px;
-    border-radius: 6px;
-    cursor: pointer;
 }
 
-.secondary-btn:hover {
-    background: #333;
-    color: white;
+::-webkit-scrollbar-thumb {
+    background: #444;
+    border-radius: 4px;
 }
 
-/* FIX MOBILE EDITOR SCROLLING (ROBUST V2) */
+::-webkit-scrollbar-thumb:hover {
+    background: #666;
+}
+
+/* Mobile */
 @media (max-width: 768px) {
-
-    /* 1. Unlock the body/html */
-    html,
-    body {
-        overflow: auto !important;
-        height: auto !important;
-    }
-
-    /* 2. Unlock the View container */
-    #appView:not(.hidden) {
-        height: auto !important;
-        /* Let content dictate height */
-        min-height: 100vh;
-        overflow: visible !important;
-        display: block !important;
-        padding-bottom: 80px;
-        /* Space for scrolling */
-    }
-
-    /* 3. Unlock internal containers */
     .app-container {
-        height: auto !important;
-        overflow: visible !important;
-        display: block !important;
+        flex-direction: column;
+    }
+
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 80%;
+        margin-left: -80%;
+        /* Hidden */
+        box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .app-container.collapsed .sidebar {
+        margin-left: 0;
+        /* Shown */
+    }
+
+    .sidebar-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: fixed;
+        right: 20px;
+        top: 20px;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: var(--accent-color);
+        z-index: 100;
+        font-size: 1.5rem;
+    }
+
+    .app-navbar {
+        padding: 10px 15px;
+        font-size: 0.9rem;
+    }
+
+    .app-navbar span {
+        font-size: 1rem;
+    }
+
+    .nav-btn {
+        padding: 6px 12px;
+        font-size: 0.75rem;
     }
 
     .preview-area {
-        height: auto !important;
-        overflow: visible !important;
-        padding-bottom: 50px;
+        padding: 10px;
+        padding-top: 20px;
+        padding-bottom: 130px;
+        /* Space for bottom floating control */
     }
 
-    /* 4. Keep Navbar accessible */
-    .app-navbar {
-        position: sticky;
-        top: 0;
-        z-index: 1000;
-        background: #2a2a2a;
-        /* Ensure it's opaque */
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    /* Move zoom control to bottom on mobile to avoid conflict with toggle */
+    .floating-zoom-control {
+        top: auto !important;
+        bottom: 20px !important;
+        right: 10px !important;
+        left: 10px !important;
+        width: auto !important;
+        max-width: 300px;
+        margin: 0 auto;
+    }
+}
+
+@page {
+    size: A4 portrait;
+    margin: 0;
+}
+
+@media print {
+
+    .sidebar,
+    .sidebar-toggle,
+    .app-navbar,
+    .floating-zoom-control {
+        display: none !important;
+    }
+
+    .app-container {
+        display: block !important;
+        height: auto !important;
+        overflow: visible !important;
+    }
+
+    body,
+    .preview-area {
+        background: white;
+        margin: 0;
+        padding: 0;
+        overflow: visible;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        width: 100%;
+        height: auto;
+    }
+
+    #printContainer {
+        box-shadow: none;
+        margin: 0;
+        transform: scale(0.94) !important;
+        transform-origin: top left;
+        /* Allow natural size from .paper-* classes */
+    }
+
+    .poster-card {
+        border: none;
+        /* Remove border for cleaner print */
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
     }
 }

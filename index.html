@@ -24,7 +24,7 @@
             <div class="login-form">
                 <input type="email" id="emailInput" placeholder="E-mail">
                 <input type="password" id="passwordInput" placeholder="Senha">
-                <button id="loginBtn">ENTRAR 🔒</button>
+                <button id="loginBtn">ENTRAR</button>
             </div>
         </div>
     </div>
@@ -155,9 +155,12 @@
                             <span>Unidade</span>
                             <select id="productUnit">
                                 <option value="">Nenhuma</option>
+                                <option value="Um">Um</option>
                                 <option value="Kg">Kg</option>
-                                <option value="Un">Un</option>
-                                <option value="100g">100g</option>
+                                <option value="Bdj">Bdj</option>
+                                <option value="Saco">Saco</option>
+                                <option value="Cada">Cada</option>
+                                <option value="Cx">Cx</option>
                             </select>
                         </label>
                     </div>
@@ -166,6 +169,7 @@
                 <div class="control-group" id="paramsGroup">
                     <!-- Font Sizes -->
                     <h3>Tamanho da Fonte</h3>
+
                     <div class="price-row">
                         <label style="flex:1">
                             <span>Oferta</span>
@@ -227,8 +231,23 @@
                         Padrão</button>
                 </div>
 
+
+
                 <div class="control-group">
+                    <h3>Ações</h3>
+                    <div class="action-row" style="display:flex; gap:10px; margin-bottom:10px;">
+                        <button id="undoBtn" class="secondary-btn" title="Desfazer">↩️ Desfazer</button>
+                        <button id="redoBtn" class="secondary-btn" title="Refazer">Refazer ↪️</button>
+                    </div>
                     <h3>Visual</h3>
+                    <label>
+                        <span>Fonte Principal</span>
+                        <select id="fontSelect">
+                            <option value="'Oferta do Dia', 'Anton', sans-serif">Padrão (Oferta do Dia)</option>
+                            <option value="'Impact', sans-serif">Impact</option>
+                            <option value="'Anton', sans-serif">Anton</option>
+                        </select>
+                    </label>
                     <label>
                         <span>Tema (Fundo)</span>
                         <select id="backgroundTheme">
@@ -236,6 +255,15 @@
                             <option value="yellow">Amarelo</option>
                             <option value="vector" selected>Vetor (Amarelo Principal)</option>
                         </select>
+                    </label>
+                    </select>
+                    </label>
+                    <label>
+                        <span>Imagem de Fundo/Logo</span>
+                        <input type="file" id="bgUpload" accept="image/*">
+                        <button id="clearBgBtn" class="text-btn-danger"
+                            style="margin-top:5px; font-size:0.8rem; background:none; border:none; color:#ff453a; cursor:pointer; display:none;">remover
+                            imagem ✖</button>
                     </label>
                 </div>
 
@@ -284,6 +312,16 @@
 
             <!-- Preview Area -->
             <main class="preview-area">
+                <div class="floating-zoom-control"
+                    style="position: absolute; right: 20px; top: 20px; background: rgba(0,0,0,0.8); padding: 15px; border-radius: 8px; border: 1px solid #444; backdrop-filter: blur(5px); z-index: 100; color: white; width: 220px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
+                    <span
+                        style="display:flex; justify-content:space-between; font-weight: bold; font-size: 0.9em; margin-bottom: 8px; color: var(--accent-color);">
+                        TAMANHO DO CONTEÚDO
+                        <span id="contentScaleDisplay">100%</span>
+                    </span>
+                    <input type="range" id="contentScaleSlider" min="0.5" max="2.0" step="0.1" value="1.0"
+                        style="width:100%; cursor: pointer;">
+                </div>
                 <div id="printContainer" class="print-container paper-a4 portrait layout-1">
                     <!-- Poster Template (Repeated via JS) -->
                     <div class="poster-card">
@@ -307,9 +345,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"
         integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="mobile_scale.js"></script>
-    <script src="print_fix.js"></script>
-    <script src="script.js"></script>
+    <script type="module" src="js/main.js"></script>
 </body>
 
 </html>
