@@ -278,6 +278,7 @@ button {
     /* Smooth drag */
     /* Ensure page break */
     page-break-after: always;
+    flex-shrink: 0;
 }
 
 /* ... Keep existing layout/poster classes logic, basically unchanged ... */

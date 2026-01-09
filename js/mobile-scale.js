@@ -24,9 +24,11 @@ export function updatePreviewScale() {
     const naturalWidth = printContainer.offsetWidth;
     const naturalHeight = printContainer.offsetHeight;
 
-    // Force width to prevent squashing before transform
+    // Force width/height to prevent squashing before transform
     printContainer.style.minWidth = `${naturalWidth}px`;
     printContainer.style.width = `${naturalWidth}px`;
+    printContainer.style.minHeight = `${naturalHeight}px`;
+    printContainer.style.height = `${naturalHeight}px`;
 
     // Calculate Scale with safety margin
     const safetyMargin = 0.95;
