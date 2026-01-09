@@ -1043,19 +1043,25 @@ h2 {
     .preview-area {
         padding: 10px;
         padding-top: 20px;
-        padding-bottom: 130px;
-        /* Space for bottom floating control */
+        padding-bottom: 40px;
+        flex-direction: column;
+        align-items: center;
+        display: flex;
     }
 
     /* Move zoom control to bottom on mobile to avoid conflict with toggle */
     .floating-zoom-control {
-        top: auto !important;
-        bottom: 20px !important;
-        right: 10px !important;
-        left: 10px !important;
-        width: auto !important;
+        position: static !important;
+        margin-top: 20px !important;
+        margin-bottom: 20px !important;
+        width: 90% !important;
         max-width: 300px;
-        margin: 0 auto;
+        order: 2;
+        /* Ensure it comes after poster */
+    }
+
+    #printContainer {
+        order: 1;
     }
 }
 

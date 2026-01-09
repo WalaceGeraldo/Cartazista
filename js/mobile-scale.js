@@ -52,6 +52,12 @@ export function updatePreviewScale() {
     } else {
         printContainer.style.marginTop = '0px';
     }
+
+    // NEW: Remove the empty space below caused by scaling
+    // The element takes up 'naturalHeight' in flow, but looks like 'scaledHeight'.
+    // We remove the difference so the next element (slider) comes up.
+    const hiddenGap = naturalHeight - scaledHeight;
+    printContainer.style.marginBottom = `-${hiddenGap}px`;
 }
 
 export function initMobileScale() {
