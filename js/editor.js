@@ -117,6 +117,73 @@ function setupListeners() {
         });
     }
 
+    // Font Style Dropdown
+    const styleSelect = document.getElementById('fontStyleSelect');
+    if (styleSelect) {
+        styleSelect.addEventListener('change', (e) => {
+            const val = e.target.value;
+            const container = document.getElementById('printContainer');
+
+            // Map values to weight/style
+            let weight = '400';
+            let style = 'normal';
+
+            switch (val) {
+                case 'normal':
+                    weight = '400';
+                    style = 'normal';
+                    break;
+                case 'bold':
+                    weight = '700';
+                    style = 'normal';
+                    break;
+                case 'italic':
+                    weight = '400';
+                    style = 'italic';
+                    break;
+                case 'bold-italic':
+                    weight = '700';
+                    style = 'italic';
+                    break;
+            }
+
+            container.style.setProperty('--poster-font-weight', weight);
+            container.style.setProperty('--poster-font-style', style);
+        });
+    }
+
+    // Font Style Toggles
+    const btnBold = document.getElementById('btnToggleBold');
+    if (btnBold) {
+        btnBold.addEventListener('click', () => {
+            const container = document.getElementById('printContainer');
+            const currentWeight = getComputedStyle(container).getPropertyValue('--poster-font-weight').trim();
+            // Toggle between 700 (Bold) and 400 (Normal)
+            // Or if using standard fonts, maybe 400 is default? 
+            // Let's assume default is 700. If 700, go 400. If 400, go 700.
+            const newWeight = (currentWeight === '700' || currentWeight === 'bold') ? '400' : '700';
+            container.style.setProperty('--poster-font-weight', newWeight);
+
+            // Visual feedback
+            btnBold.style.background = newWeight === '700' ? 'var(--accent-color)' : '';
+            btnBold.style.color = newWeight === '700' ? 'white' : '';
+        });
+    }
+
+    const btnItalic = document.getElementById('btnToggleItalic');
+    if (btnItalic) {
+        btnItalic.addEventListener('click', () => {
+            const container = document.getElementById('printContainer');
+            const currentStyle = getComputedStyle(container).getPropertyValue('--poster-font-style').trim();
+            const newStyle = (currentStyle === 'italic') ? 'normal' : 'italic';
+            container.style.setProperty('--poster-font-style', newStyle);
+
+            // Visual feedback
+            btnItalic.style.background = newStyle === 'italic' ? 'var(--accent-color)' : '';
+            btnItalic.style.color = newStyle === 'italic' ? 'white' : '';
+        });
+    }
+
     // Undo/Redo
     document.getElementById('undoBtn')?.addEventListener('click', undo);
     document.getElementById('redoBtn')?.addEventListener('click', redo);
@@ -327,6 +394,27 @@ function setupInteraction(element, dataIndex, dataField) {
         element.focus();
         element.classList.add('editing');
         selectElement(element);
+    });
+
+    // Mobile Double Tap Support
+    let lastTap = 0;
+    element.addEventListener('touchend', (e) => {
+        // Allow default behavior if already editing (so cursor placement works)
+        if (element.contentEditable === 'true') return;
+
+        const currentTime = new Date().getTime();
+        const tapLength = currentTime - lastTap;
+
+        if (tapLength < 300 && tapLength > 0) {
+            e.preventDefault(); // Prevent potential zoom or other double-tap browser actions
+            // Force edit mode
+            element.contentEditable = true;
+            element.focus();
+            element.click(); // Dispatch click to ensure selection logic runs
+            element.classList.add('editing');
+            selectElement(element);
+        }
+        lastTap = currentTime;
     });
 
     element.addEventListener('blur', () => {

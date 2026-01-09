@@ -402,6 +402,10 @@ button {
     --scale-y-detail: 1;
     --scale-y-category: 1;
     --scale-y-price: 1;
+
+    /* New Style Vars */
+    --poster-font-weight: 700;
+    --poster-font-style: normal;
 }
 
 /* Layout overrides */
@@ -428,17 +432,22 @@ button {
     --fs-price: 4rem;
 }
 
+/* ... existing overrides ... */
+
 /* Element Styles */
 .offer-label {
     color: var(--poster-color-red);
     font-size: var(--fs-offer);
+    font-weight: var(--poster-font-weight);
+    font-style: var(--poster-font-style);
     margin-bottom: 0.2rem;
     transform: rotate(-2deg) scaleY(var(--scale-y-offer));
 }
 
 .product-name {
     font-size: var(--fs-name);
-    font-weight: 700;
+    font-weight: var(--poster-font-weight);
+    font-style: var(--poster-font-style);
     line-height: 1;
     margin-bottom: 0.2rem;
     transform: scaleY(var(--scale-y-name));
@@ -447,12 +456,17 @@ button {
 .product-category {
     font-size: var(--fs-category);
     font-weight: 600;
+    /* Usually keep category slightly lighter or fixed? Let's keep fixed for now or 600 matches bold usually */
+    font-style: var(--poster-font-style);
     margin-bottom: 0.2rem;
     transform: scaleY(var(--scale-y-category));
 }
 
 .product-detail {
     font-size: var(--fs-detail);
+    font-weight: 400;
+    /* Detail usually thinner */
+    font-style: var(--poster-font-style);
     transform: scaleY(var(--scale-y-detail));
     margin-bottom: 0.5rem;
 }
@@ -461,6 +475,9 @@ button {
     color: var(--poster-color-red);
     font-size: var(--fs-price);
     line-height: 0.9;
+    font-weight: var(--poster-font-weight);
+    font-style: normal;
+    /* Price usually stays upright? Let's allow italic actually */
     transform: scaleY(var(--scale-y-price));
     display: inline-flex;
     align-items: baseline;
