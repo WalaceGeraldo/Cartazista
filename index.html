@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cartazista - Criador de Ofertas</title>
+    <link rel="icon" type="image/png" href="assets/favicon.png">
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -159,33 +160,26 @@
                         </div>
                         <div class="menu-divider"></div>
                         <button class="menu-dropdown-item" id="menuEditProfileBtn">
-                            <span class="menu-item-icon">👤</span>
                             <span class="menu-item-text">Editar Perfil</span>
                         </button>
                         <button class="menu-dropdown-item" id="menuSettingsBtn">
-                            <span class="menu-item-icon">⚙️</span>
                             <span class="menu-item-text">Configurações</span>
                         </button>
                         <button class="menu-dropdown-item" id="menuTemplatesBtn">
-                            <span class="menu-item-icon">📋</span>
                             <span class="menu-item-text">Meus Templates</span>
                         </button>
                         <button class="menu-dropdown-item" id="menuUpgradeBtn">
-                            <span class="menu-item-icon">👑</span>
                             <span class="menu-item-text">Fazer Upgrade</span>
                         </button>
                         <div class="menu-divider"></div>
                         <button class="menu-dropdown-item" id="menuHelpBtn">
-                            <span class="menu-item-icon">❓</span>
                             <span class="menu-item-text">Ajuda & Suporte</span>
                         </button>
                         <button class="menu-dropdown-item" id="menuAboutBtn">
-                            <span class="menu-item-icon">ℹ️</span>
                             <span class="menu-item-text">Sobre o App</span>
                         </button>
                         <div class="menu-divider"></div>
                         <button class="menu-dropdown-item menu-item-danger" id="userLogoutBtn">
-                            <span class="menu-item-icon">🚪</span>
                             <span class="menu-item-text">Sair</span>
                         </button>
                     </div>
@@ -201,7 +195,7 @@
                     <h1>BEM-VINDO DE VOLTA!</h1>
                     <p>Minha Loja • <span id="currentUserDisplay">Thiago Ribeiro</span></p>
                 </div>
-                <button class="edit-profile-btn" onclick="alert('Editar Perfil (Em Breve)')">✏️ Editar Perfil</button>
+                <button id="headerEditProfileBtn" class="edit-profile-btn">✏️ Editar Perfil</button>
             </header>
 
             <!-- Hero Action -->
@@ -226,22 +220,22 @@
             </div>
 
             <div class="action-grid">
-                <div class="action-card green" onclick="document.getElementById('createPosterBtn').click()">
+                <div class="action-card card-offer" onclick="document.getElementById('createPosterBtn').click()">
                     <div class="card-icon-overlay">🏷️</div>
                     <h3>Cartaz de Oferta</h3>
                     <p>Promoções e descontos</p>
                 </div>
-                <div class="action-card blue" onclick="document.getElementById('createPosterBtn').click()">
+                <div class="action-card card-leve" onclick="document.getElementById('createPosterBtn').click()">
                     <div class="card-icon-overlay">%</div>
                     <h3>LEVE / PAGUE</h3>
                     <p>Ofertas tipo leve 3 pague 2</p>
                 </div>
-                <div class="action-card purple" onclick="document.getElementById('createPosterBtn').click()">
+                <div class="action-card card-club" onclick="document.getElementById('createPosterBtn').click()">
                     <div class="card-icon-overlay">👥</div>
                     <h3>Preço de Clube</h3>
                     <p>Preço normal x preço clube</p>
                 </div>
-                <div class="action-card orange" onclick="alert('Templates (Em Breve)')">
+                <div class="action-card card-templates" onclick="document.getElementById('menuTemplatesBtn').click()">
                     <div class="card-icon-overlay">🔲</div>
                     <h3>Ver Templates</h3>
                     <p>Escolha um modelo</p>
@@ -378,15 +372,15 @@
                 </div>
             </div>
 
-            <!-- Tip Banner -->
-            <div class="tip-banner">
-                <div class="tip-icon">💡</div>
-                <div class="tip-content">
-                    <h4>DICA DO CARTAZISTA</h4>
-                    <h3>Renove seus cartazes</h3>
-                    <p>Troque os cartazes semanalmente para manter a loja sempre com cara de novidade.</p>
+            <!-- Dashboard Footer -->
+            <footer class="dashboard-footer">
+                <p>&copy; 2026 Cartazista. Todos os direitos reservados.</p>
+                <div class="footer-links">
+                    <a href="#" id="footerHelpBtn">Ajuda</a>
+                    <a href="#" id="footerPrivacyBtn">Privacidade</a>
+                    <a href="#" id="footerTermsBtn">Termos</a>
                 </div>
-            </div>
+            </footer>
 
         </main>
 
@@ -394,6 +388,147 @@
         <div style="display:none">
             <button id="logoutBtn" class="logout-btn">Sair</button>
             <div id="userTableBody"></div>
+        </div>
+
+        <!-- Upgrade Modal (New) -->
+        <div id="upgradeModal" class="modal hidden">
+            <div class="modal-content" style="max-width: 500px;">
+                <div class="modal-header">
+                    <h3>Planos & Upgrade</h3>
+                    <button id="closeUpgradeBtn" class="close-modal-btn">✖</button>
+                </div>
+                <div class="modal-form" style="display: flex; flex-direction: column; gap: 15px;">
+                    <div class="profile-option-card" onclick="alert('Já é seu plano atual')">
+                        <div class="option-icon" style="background:#555;">🆓</div>
+                        <div class="option-info">
+                            <h4>Plano Gratuito</h4>
+                            <p>5 cartazes/mês • Básico</p>
+                        </div>
+                        <div class="option-arrow">Ativo</div>
+                    </div>
+                    <div class="profile-option-card" onclick="alert('Upgrade para Básico (Em breve)')">
+                        <div class="option-icon" style="background:rgba(255, 165, 2, 0.2); color:#ffa502;">⭐</div>
+                        <div class="option-info">
+                            <h4>Plano Básico</h4>
+                            <p>25 cartazes/mês • R$ 19,90</p>
+                        </div>
+                        <div class="option-arrow">→</div>
+                    </div>
+                    <div class="profile-option-card" onclick="alert('Upgrade para Pro (Em breve)')">
+                        <div class="option-icon" style="background:rgba(0, 210, 211, 0.2); color:#00d2d3;">👑</div>
+                        <div class="option-info">
+                            <h4>Plano Pro</h4>
+                            <p>100 cartazes/mês • R$ 49,90</p>
+                        </div>
+                        <div class="option-arrow">→</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Profile Modal (Enhanced) -->
+        <div id="editProfileModal" class="modal hidden">
+            <div class="modal-content" style="max-width: 500px;">
+                <div class="modal-header">
+                    <h3>Editar Perfil</h3>
+                    <button id="closeEditProfileBtn" class="close-modal-btn">✖</button>
+                </div>
+                <div class="modal-form" style="display: flex; flex-direction: column; gap: 15px;">
+
+                    <div class="profile-option-card"
+                        onclick="alert('Funcionalidade em desenvolvimento: Alterar nome e foto')">
+                        <div class="option-icon">📷</div>
+                        <div class="option-info">
+                            <h4>Alterar Foto e Nome</h4>
+                            <p>Atualize sua identidade visual</p>
+                        </div>
+                        <div class="option-arrow">→</div>
+                    </div>
+
+                    <div class="profile-option-card"
+                        onclick="alert('Funcionalidade em desenvolvimento: Informações da loja')">
+                        <div class="option-icon">🏪</div>
+                        <div class="option-info">
+                            <h4>Dados da Loja</h4>
+                            <p>Endereço, telefone e horário</p>
+                        </div>
+                        <div class="option-arrow">→</div>
+                    </div>
+
+                    <div class="profile-option-card" onclick="alert('Funcionalidade em desenvolvimento: Preferências')">
+                        <div class="option-icon">⚙️</div>
+                        <div class="option-info">
+                            <h4>Preferências</h4>
+                            <p>Personalize sua experiência</p>
+                        </div>
+                        <div class="option-arrow">→</div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Modal (New) -->
+        <div id="settingsModal" class="modal hidden">
+            <div class="modal-content" style="max-width: 500px;">
+                <div class="modal-header">
+                    <h3>Configurações</h3>
+                    <button id="closeSettingsBtn" class="close-modal-btn">✖</button>
+                </div>
+                <div class="modal-form" style="display: flex; flex-direction: column; gap: 15px;">
+
+                    <!-- Theme Toggle -->
+                    <div class="profile-option-card">
+                        <div class="option-icon">🌙</div>
+                        <div class="option-info">
+                            <h4>Tema Escuro</h4>
+                            <p>Ajustar aparência do sistema</p>
+                        </div>
+                        <div class="option-control">
+                            <label class="switch">
+                                <input type="checkbox" checked onclick="alert('Trocar tema (Em breve)')">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Print Prefs -->
+                    <div class="profile-option-card" onclick="alert('Configurar Impressão (Em breve)')">
+                        <div class="option-icon">🖨️</div>
+                        <div class="option-info">
+                            <h4>Preferências de Impressão</h4>
+                            <p>Margens, papel padrão e qualidade</p>
+                        </div>
+                        <div class="option-arrow">→</div>
+                    </div>
+
+                    <!-- Notifications -->
+                    <div class="profile-option-card">
+                        <div class="option-icon">🔔</div>
+                        <div class="option-info">
+                            <h4>Notificações</h4>
+                            <p>Alertas de ofertas e sistema</p>
+                        </div>
+                        <div class="option-control">
+                            <label class="switch">
+                                <input type="checkbox" checked onclick="alert('Notificações (Em breve)')">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Currency/Lang -->
+                    <div class="profile-option-card" onclick="alert('Moeda e Idioma (Em breve)')">
+                        <div class="option-icon">🌍</div>
+                        <div class="option-info">
+                            <h4>Idioma e Moeda</h4>
+                            <p>Português (BR) • R$ (BRL)</p>
+                        </div>
+                        <div class="option-arrow">→</div>
+                    </div>
+
+                </div>
+            </div>
         </div>
     </div>
 
@@ -657,7 +792,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"
         integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script type="module" src="js/main.js"></script>
+    <script type="module" src="js/main.js?v=2.2"></script>
 </body>
 
 </html>

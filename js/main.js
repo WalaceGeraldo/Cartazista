@@ -155,44 +155,64 @@ function initAuthListeners() {
     });
 
     // Menu: Edit Profile
-    document.getElementById('menuEditProfileBtn')?.addEventListener('click', () => {
+    const openEditProfile = () => {
         menuDropdown?.classList.add('hidden');
-        alert('🎨 Funcionalidade "Editar Perfil" em desenvolvimento!\n\nEm breve você poderá:\n• Alterar nome e foto de perfil\n• Atualizar informações da loja\n• Personalizar preferências');
+        document.getElementById('editProfileModal')?.classList.remove('hidden');
+    };
+
+    document.getElementById('menuEditProfileBtn')?.addEventListener('click', openEditProfile);
+    document.getElementById('headerEditProfileBtn')?.addEventListener('click', openEditProfile);
+
+    // Close Edit Profile Modal
+    document.getElementById('closeEditProfileBtn')?.addEventListener('click', () => {
+        document.getElementById('editProfileModal')?.classList.add('hidden');
     });
 
     // Menu: Settings
     document.getElementById('menuSettingsBtn')?.addEventListener('click', () => {
         menuDropdown?.classList.add('hidden');
-        alert('⚙️ Funcionalidade "Configurações" em desenvolvimento!\n\nEm breve você poderá:\n• Configurar tema (claro/escuro)\n• Ajustar preferências de impressão\n• Gerenciar notificações\n• Configurar moeda e idioma');
+        document.getElementById('settingsModal')?.classList.remove('hidden');
+    });
+
+    // Close Settings Modal
+    document.getElementById('closeSettingsBtn')?.addEventListener('click', () => {
+        document.getElementById('settingsModal')?.classList.add('hidden');
     });
 
     // Menu: Templates
     document.getElementById('menuTemplatesBtn')?.addEventListener('click', () => {
         menuDropdown?.classList.add('hidden');
-        alert('📋 Funcionalidade "Meus Templates" em desenvolvimento!\n\nEm breve você poderá:\n• Salvar templates personalizados\n• Carregar templates salvos\n• Compartilhar templates\n• Importar templates da comunidade');
+        document.getElementById('templatesModal')?.classList.remove('hidden');
+    });
+    document.getElementById('closeTemplatesBtn')?.addEventListener('click', () => {
+        document.getElementById('templatesModal')?.classList.add('hidden');
     });
 
     // Menu: Upgrade Plan
     document.getElementById('menuUpgradeBtn')?.addEventListener('click', () => {
         menuDropdown?.classList.add('hidden');
-        const session = getSession();
-        if (session) {
-            const planKey = session.plan || 'free';
-            const planData = PLANS[planKey] || PLANS['free'];
-            alert(`👑 UPGRADE DE PLANO\n\nPlano Atual: ${planData.label}\nLimite: ${planData.limit} cartazes/mês\n\n📊 PLANOS DISPONÍVEIS:\n\n🆓 Gratuito - 5 cartazes/mês\n⭐ Básico - 25 cartazes/mês - R$ 19,90/mês\n👑 Pro - 100 cartazes/mês - R$ 49,90/mês\n\n💡 Funcionalidade de pagamento em breve!`);
-        }
+        document.getElementById('upgradeModal')?.classList.remove('hidden');
+    });
+    document.getElementById('closeUpgradeBtn')?.addEventListener('click', () => {
+        document.getElementById('upgradeModal')?.classList.add('hidden');
     });
 
     // Menu: Help & Support
     document.getElementById('menuHelpBtn')?.addEventListener('click', () => {
         menuDropdown?.classList.add('hidden');
-        alert('❓ AJUDA & SUPORTE\n\n📚 Recursos disponíveis:\n• Tutoriais em vídeo\n• Documentação completa\n• FAQ - Perguntas frequentes\n• Suporte por e-mail\n\n📧 Contato: suporte@cartazista.com\n💬 WhatsApp: (11) 99999-9999\n\n🕐 Horário de atendimento:\nSeg-Sex: 9h às 18h');
+        document.getElementById('helpModal')?.classList.remove('hidden');
+    });
+    document.getElementById('closeHelpBtn')?.addEventListener('click', () => {
+        document.getElementById('helpModal')?.classList.add('hidden');
     });
 
     // Menu: About
     document.getElementById('menuAboutBtn')?.addEventListener('click', () => {
         menuDropdown?.classList.add('hidden');
-        alert('ℹ️ SOBRE O CARTAZISTA\n\n🎨 Versão: 2.0.0\n📅 Última atualização: Janeiro 2026\n\n💡 Cartazista é a solução completa para criar cartazes profissionais de ofertas para seu comércio.\n\n✨ Recursos:\n• Editor visual intuitivo\n• Múltiplos layouts\n• Exportação em PDF\n• Templates personalizáveis\n\n👨‍💻 Desenvolvido com ❤️ para pequenos e médios comerciantes\n\n© 2026 Cartazista - Todos os direitos reservados');
+        document.getElementById('aboutModal')?.classList.remove('hidden');
+    });
+    document.getElementById('closeAboutBtn')?.addEventListener('click', () => {
+        document.getElementById('aboutModal')?.classList.add('hidden');
     });
 
 
