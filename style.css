@@ -2973,3 +2973,75 @@ input:checked+.slider:before {
 .slider.round:before {
     border-radius: 50%;
 }
+
+/* Snap Guide */
+.snap-guide {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    border-left: 2px dashed #ff00de;
+    /* Magenta for visibility */
+    z-index: 9999;
+    transform: translateX(-50%);
+    pointer-events: none;
+    display: none;
+}
+
+.snap-guide.visible {
+    display: block;
+}
+
+/* Mobile Toolbar - Subtle/Glass */
+.mobile-toolbar {
+    position: absolute;
+    background: rgba(40, 40, 40, 0.85);
+    /* Semi-transparent dark */
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-radius: 20px;
+    /* Pillow shape */
+    padding: 6px 12px;
+    display: flex;
+    gap: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    z-index: 10000;
+    transition: opacity 0.2s, transform 0.2s;
+    pointer-events: auto;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.mobile-toolbar.hidden {
+    display: none;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.toolbar-btn {
+    background: transparent;
+    color: rgba(255, 255, 255, 0.9);
+    border: none;
+    padding: 6px;
+    border-radius: 50%;
+    font-size: 1.1rem;
+    cursor: pointer;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s, background 0.2s;
+    width: 36px;
+    height: 36px;
+}
+
+.toolbar-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: scale(1.1);
+}
+
+.toolbar-btn:active {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(0.95);
+    color: #fff;
+}

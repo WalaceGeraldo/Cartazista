@@ -567,22 +567,18 @@
                         <span>Detalhe (Opcional)</span>
                         <input type="text" id="productDetail" placeholder="Ex: Graúda" value="GRAUDA">
                     </label>
-                    <div class="price-row">
-                        <label>
-                            <span>Preço (R$)</span>
+                    <div class="price-row" style="display: flex; gap: 5px;">
+                        <label style="flex: 0 0 60px;">
+                            <span>Moeda</span>
+                            <input type="text" id="productCurrency" placeholder="R$" value="R$">
+                        </label>
+                        <label style="flex: 1;">
+                            <span>Preço</span>
                             <input type="text" id="productPrice" placeholder="0,00" value="88,88">
                         </label>
-                        <label>
+                        <label style="flex: 0 0 80px;">
                             <span>Unidade</span>
-                            <select id="productUnit">
-                                <option value="">Nenhuma</option>
-                                <option value="Um">Um</option>
-                                <option value="Kg">Kg</option>
-                                <option value="Bdj">Bdj</option>
-                                <option value="Saco">Saco</option>
-                                <option value="Cada">Cada</option>
-                                <option value="Cx">Cx</option>
-                            </select>
+                            <input type="text" id="productUnit" placeholder="Ex: Kg" value="">
                         </label>
                     </div>
                 </div>
@@ -659,6 +655,10 @@
                     <div class="action-row" style="display:flex; gap:10px; margin-bottom:10px;">
                         <button id="undoBtn" class="secondary-btn" title="Desfazer">↩️ Desfazer</button>
                         <button id="redoBtn" class="secondary-btn" title="Refazer">Refazer ↪️</button>
+                    </div>
+                    <div class="action-row" style="display:flex; gap:10px; margin-bottom:10px;">
+                        <button id="copyBtn" class="secondary-btn" title="Copiar Texto">📋 Copiar</button>
+                        <button id="pasteBtn" class="secondary-btn" title="Colar Texto">📝 Colar</button>
                     </div>
                     <h3>Visual</h3>
                     <label>
@@ -769,6 +769,12 @@
                     <input type="range" id="contentScaleSlider" min="0.5" max="2.0" step="0.1" value="1.0"
                         style="width:100%; cursor: pointer;">
                 </div>
+                <!-- Mobile Toolbar -->
+                <div id="mobileToolbar" class="mobile-toolbar hidden">
+                    <button id="mobileCopyBtn" class="toolbar-btn" title="Copiar">📋</button>
+                    <button id="mobilePasteBtn" class="toolbar-btn" title="Colar">📝</button>
+                </div>
+
                 <div id="printContainer" class="print-container paper-a4 portrait layout-1">
                     <!-- Poster Template (Repeated via JS) -->
                     <div class="poster-card">

@@ -10,8 +10,80 @@ const elements = {
 export function initEditor() {
     setupListeners();
     subscribe(renderPoster);
+    subscribe(renderPoster);
     renderPoster();
 }
+
+import { getSelectedElement, updateSelectedElementText } from './drag-drop.js';
+
+async function copyText() {
+    const el = getSelectedElement();
+    if (!el) {
+        alert('Selecione um item primeiro para copiar.');
+        return;
+    }
+
+    // Extract text content (exclude children if necessary, but innerText usually works)
+    // For price container, innerText might be "R$ 88,88 /Kg". That's fine.
+    const text = el.innerText;
+
+    try {
+        await navigator.clipboard.writeText(text);
+        const btn = document.getElementById('copyBtn');
+        const original = btn.innerText;
+        btn.innerText = "Copiado!";
+        setTimeout(() => btn.innerText = original, 1500);
+    } catch (err) {
+        console.error('Clipboard failed', err);
+        // Fallback
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textArea);
+        alert('Texto copiado!');
+    }
+}
+
+async function pasteText() {
+    const el = getSelectedElement();
+    if (!el) {
+        alert('Selecione um item primeiro para colar o texto.');
+        return;
+    }
+
+    let text = '';
+    try {
+        text = await navigator.clipboard.readText();
+    } catch (err) {
+        console.warn('Clipboard read failed/denied', err);
+        text = prompt('Colar texto aqui (sem permissão de acesso à área de transferência):');
+    }
+
+    if (text) {
+        if (el.classList.contains('price-container')) {
+            // Special handling for price? Or just let user edit individual parts?
+            // Since price container includes currency and unit, pasting whole text might break structure if we just replace innerText.
+            // We should probably only allow pasting into leaf nodes (which are selectedElement usually).
+            // But getSelectedElement returns the container for price usually?
+            // drag-drop.js: selectElement(priceContainer).
+            // We might need to handle this.
+            // If price container is selected, we can't easily guess what to paste.
+            alert('Selecione o valor ou a moeda individualmente para colar.');
+            return;
+        }
+
+        // Update Element
+        el.innerText = text;
+
+        // Trigger update event to save state
+        el.dispatchEvent(new Event('blur'));
+        // Force update if blur handler needs to know
+        updateSelectedElementText(text);
+    }
+}
+
 
 
 // Default Font Sizes for Layouts (Matches CSS)
@@ -79,10 +151,11 @@ function setupListeners() {
     bindInput('productCategory', 'category');
     bindInput('productDetail', 'detail');
     bindInput('productPrice', 'price');
+    bindInput('productCurrency', 'currency');
 
     const unitEl = document.getElementById('productUnit');
     if (unitEl) {
-        unitEl.addEventListener('change', (e) => updateDefault('unit', e.target.value));
+        unitEl.addEventListener('input', (e) => updateDefault('unit', e.target.value));
     }
 
     // Config Listeners
@@ -186,7 +259,45 @@ function setupListeners() {
 
     // Undo/Redo
     document.getElementById('undoBtn')?.addEventListener('click', undo);
+    document.getElementById('undoBtn')?.addEventListener('click', undo);
     document.getElementById('redoBtn')?.addEventListener('click', redo);
+
+    document.getElementById('copyBtn')?.addEventListener('click', copyText);
+    document.getElementById('pasteBtn')?.addEventListener('click', pasteText);
+
+    document.getElementById('mobileCopyBtn')?.addEventListener('click', () => {
+        copyText();
+        // Feedback
+        const btn = document.getElementById('mobileCopyBtn');
+        const original = btn.innerText;
+        btn.innerText = "OK!";
+        setTimeout(() => btn.innerText = original, 1000);
+    });
+    document.getElementById('mobilePasteBtn')?.addEventListener('click', pasteText);
+
+    // Mobile Toolbar Logic
+    window.addEventListener('cartazista:selection', (e) => {
+        const toolbar = document.getElementById('mobileToolbar');
+        const element = e.detail.element;
+
+        if (element && window.matchMedia("(max-width: 768px)").matches) {
+            toolbar.classList.remove('hidden');
+            updateToolbarPosition(toolbar, element);
+        } else {
+            toolbar.classList.add('hidden');
+        }
+    });
+
+    // Update position on drag/resize?
+    // We could listen to touchmove? Or just let it stay until next selection interaction?
+    // Ideally it follows.
+    document.addEventListener('touchmove', () => {
+        const toolbar = document.getElementById('mobileToolbar');
+        const el = getSelectedElement();
+        if (!toolbar.classList.contains('hidden') && el) {
+            updateToolbarPosition(toolbar, el);
+        }
+    });
 
     // Image Upload
     document.getElementById('bgUpload')?.addEventListener('change', (e) => {
@@ -344,7 +455,7 @@ function createPosterCard(data, index) {
 
     const currency = document.createElement('span');
     currency.className = 'currency';
-    currency.innerText = 'R$';
+    currency.innerText = data.currency !== undefined ? data.currency : 'R$';
 
     const priceVal = document.createElement('span');
     priceVal.className = 'price-value';
@@ -355,7 +466,12 @@ function createPosterCard(data, index) {
     const unitVal = document.createElement('span');
     unitVal.className = 'unit-value';
     unitVal.style.fontSize = "0.4em";
-    unitVal.innerText = data.unit ? ` /${data.unit}` : '';
+    // Check if unit starts with / or not. If user typed "Kg", we add space or /.
+    // Let's just blindly add slash if it's not empty and doesn't have it? 
+    // Or just trust the user input? The user wanted "editable KG". 
+    // Often "Kg" becomes "/Kg" or just "Kg". Let's try: if data.unit, add space + data.unit.
+    // Or just:
+    unitVal.innerText = data.unit ? ` ${data.unit}` : '';
 
     const selectContainer = (e) => {
         e.stopPropagation();
@@ -459,4 +575,21 @@ export async function downloadPDF() {
         btn.disabled = false;
         updatePreviewScale();
     }
+}
+
+function updateToolbarPosition(toolbar, element) {
+    const rect = element.getBoundingClientRect();
+    const appRect = document.querySelector('.app-container').getBoundingClientRect(); // constrain to app
+
+    // Position above the element
+    let top = rect.top - 50;
+    let left = rect.left;
+
+    // Contain within viewport
+    if (top < 10) top = rect.bottom + 10;
+    if (left < 10) left = 10;
+    if (left + toolbar.offsetWidth > window.innerWidth) left = window.innerWidth - toolbar.offsetWidth - 10;
+
+    toolbar.style.top = `${top}px`;
+    toolbar.style.left = `${left}px`;
 }

@@ -13,6 +13,7 @@ export const state = {
         name: "BANANA PRATA",
         category: "",
         detail: "GRAÚDA",
+        currency: "R$",
         price: "88,88",
         unit: ""
     },

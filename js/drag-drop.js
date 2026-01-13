@@ -1,7 +1,23 @@
 
 // Drag and Drop & Resizing Logic
 
-let selectedElement = null;
+export let selectedElement = null;
+export function getSelectedElement() { return selectedElement; }
+
+export function updateSelectedElementText(text) {
+    if (selectedElement) {
+        // Find the data field it corresponds to?
+        // The 'blur' listener in setupInteraction (editor.js) handles saving.
+        // We just need to ensure the visual update persists.
+        // editor.js: setupInteraction adds a blur listener that calls updateCard.
+        // We might need to manually trigger that update.
+        // Actually editor.js has logic setupInteraction...
+        // Let's just expose a way to trigger the update from editor.js side,
+        // Or rely on the fact that we updated innerText and dispatch blur?
+        // Dispatching blur works if it was in edit mode?
+        // The element might not be contentEditable when we paste.
+    }
+}
 let activeResizeElement = null;
 let activeDragElement = null;
 let resizeHandleType = null;
@@ -21,6 +37,7 @@ let dragStartX = 0;
 let dragStartY = 0;
 let initialLeft = 0;
 let initialTop = 0;
+let snapDx = 0; // Distance in X to reach horizontal center
 
 // Helper to get current scale of container (for coordinate mapping)
 function getContainerScale() {
@@ -49,6 +66,7 @@ export function deselectElement() {
         const handles = selectedElement.querySelectorAll('.resize-handle');
         handles.forEach(h => h.remove());
         selectedElement = null;
+        window.dispatchEvent(new CustomEvent('cartazista:selection', { detail: { element: null } }));
     }
 }
 
@@ -58,6 +76,7 @@ export function selectElement(element) {
 
     selectedElement = element;
     selectedElement.classList.add('selected-element');
+    window.dispatchEvent(new CustomEvent('cartazista:selection', { detail: { element: selectedElement } }));
 
     // Create Handles
     const handleE = createHandle('e');
@@ -134,6 +153,25 @@ function dragStart(e) {
     initialLeft = parseFloat(activeDragElement.style.left) || 0;
     initialTop = parseFloat(activeDragElement.style.top) || 0;
 
+    // Calculate Snap Target (dx needed to reach center)
+    const container = document.getElementById('printContainer');
+    if (container) {
+        const cRect = container.getBoundingClientRect();
+        const eRect = activeDragElement.getBoundingClientRect();
+        const scale = getContainerScale() || 1;
+
+        const cCenter = cRect.left + (cRect.width / 2);
+        const eCenter = eRect.left + (eRect.width / 2);
+
+        // Distance in screen pixels to move to center
+        const distancePx = cCenter - eCenter;
+
+        // Convert to scaled units (which dx is in)
+        snapDx = distancePx / scale;
+    } else {
+        snapDx = null;
+    }
+
     if (e.type === 'touchstart') {
         document.addEventListener('touchmove', drag, { passive: false });
         document.addEventListener('touchend', dragEnd);
@@ -157,12 +195,45 @@ function drag(e) {
     }
 
     const currentScale = getContainerScale() || 1;
-    const dx = (clientX - dragStartX) / currentScale;
+    let dx = (clientX - dragStartX) / currentScale; // dx is mutable now
     const dy = (clientY - dragStartY) / currentScale;
 
-    activeDragElement.style.left = `${initialLeft + dx}px`;
-    activeDragElement.style.top = `${initialTop + dy}px`;
+    // --- Snap to Center Logic ---
+    const snapThreshold = 10; // scaled pixels
+    let snapped = false;
+
+    if (snapDx !== null && Math.abs(dx - snapDx) < snapThreshold) {
+        dx = snapDx;
+        snapped = true;
+    }
+
+    updateSnapGuide(snapped);
+
+    // Calculate new Position
+    let newLeft = initialLeft + dx;
+    let newTop = initialTop + dy;
+
+    activeDragElement.style.left = `${newLeft}px`;
+    activeDragElement.style.top = `${newTop}px`;
 }
+
+function updateSnapGuide(visible) {
+    let guide = document.querySelector('.snap-guide');
+    if (!guide) {
+        const container = document.getElementById('printContainer');
+        if (container) {
+            guide = document.createElement('div');
+            guide.className = 'snap-guide';
+            container.appendChild(guide);
+        }
+    }
+
+    if (guide) {
+        if (visible) guide.classList.add('visible');
+        else guide.classList.remove('visible');
+    }
+}
+
 
 function dragEnd() {
     activeDragElement = null;
@@ -170,6 +241,7 @@ function dragEnd() {
     document.removeEventListener('mouseup', dragEnd);
     document.removeEventListener('touchmove', drag);
     document.removeEventListener('touchend', dragEnd);
+    updateSnapGuide(false);
 }
 
 // --- RESIZE LOGIC ---
