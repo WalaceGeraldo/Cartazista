@@ -429,76 +429,127 @@ function createPosterCard(data, index) {
     priceVal.className = 'price-value';
     priceVal.innerText = data.price;
 
-    // Custom setup for priceVal:
-    // 1. Should NOT be draggable itself (container manages dragging)
-    // 2. Click should select container
-    // 3. Double-click should still allow text editing
-
-    // We replicate setupInteraction but skip makeDraggable and force container selection
-    priceVal.contentEditable = false;
-
-    // Click logic moved to container listeners below
-
-    // Edit Logic
-    priceVal.addEventListener('dblclick', (e) => {
-        e.stopPropagation();
-        priceVal.contentEditable = true;
-        priceVal.focus();
-        priceVal.classList.add('editing');
-        // Do NOT selectElement(priceVal), keep container selected?
-        // Or temporarily select priceVal for editing context?
-        // If we select priceVal, the handles might look weird or be on just the number.
-        // Let's keep selecting the container if possible, but editing needs focus.
-        // If we selectElement(priceVal), it breaks "group layout".
-        // Let's try NOT changing selection, just focus.
-        // selectElement(priceContainer); // Ensure container stays selected
-    });
-
-    // Mobile Double Tap
-    let lastTap = 0;
-    priceVal.addEventListener('touchend', (e) => {
-        if (priceVal.contentEditable === 'true') return;
-        const currentTime = new Date().getTime();
-        const tapLength = currentTime - lastTap;
-        if (tapLength < 300 && tapLength > 0) {
-            e.preventDefault();
-            priceVal.contentEditable = true;
-            priceVal.focus();
-            priceVal.classList.add('editing');
-        }
-        lastTap = currentTime;
-    });
-
-    priceVal.addEventListener('blur', () => {
-        priceVal.contentEditable = false;
-        priceVal.classList.remove('editing');
-        updateCard(index, 'price', priceVal.innerText);
-    });
+    setupInteraction(priceVal, index, 'price');
 
     const unitVal = document.createElement('span');
     unitVal.className = 'unit-value';
     unitVal.style.fontSize = "0.4em";
-    // Check if unit starts with / or not. If user typed "Kg", we add space or /.
-    // Let's just blindly add slash if it's not empty and doesn't have it? 
-    // Or just trust the user input? The user wanted "editable KG". 
-    // Often "Kg" becomes "/Kg" or just "Kg". Let's try: if data.unit, add space + data.unit.
-    // Or just:
     unitVal.innerText = data.unit ? ` ${data.unit}` : '';
 
-    const selectContainer = (e) => {
-        e.stopPropagation();
-        selectElement(priceContainer);
-    };
+    // Independent interaction for Unit too, if desired?
+    // User said "Price not selecting". Usually just price value is critical.
+    // Let's make Unit also interactive just in case? Or just leave it attached to container?
+    // If container is NOT draggable, how do we move Unit?
+    // If I make priceVal draggable, R$ and Unit stay behind?
+    // That sounds bad.
 
-    priceVal.addEventListener('click', selectContainer);
-    currency.addEventListener('click', selectContainer);
-    unitVal.addEventListener('click', selectContainer);
+    // WAIT. "Igual os outros" might mean "I want to click the number and have IT selected".
+    // If I select the container, the box is big.
+
+    // Let's try this:
+    // 1. Keep Container Draggable (so they move together).
+    // 2. Make PriceVal also Draggable/Selectable.
+    // 3. BUT stop propagation on PriceVal mousedown so it doesn't drag container?
+    // If I drag PriceVal, it moves relative to container?
+    // Then it gets misaligned.
+
+    // Let's look at "Others". "product-name" is a DIV.
+    // "price-value" is a SPAN inside a DIV.
+    // Maybe make "price-value" a DIV?
+
+    // BETTER PLAN requested by user interpretation:
+    // "Leave it equal to the others" -> Simple, standard behavior.
+    // The previous behavior (before my "fix") was: Double Draggable.
+    // User complaint was "Only price not selecting everything".
+    // Maybe they meant "When I select price, it doesn't select R$ and Unit"?
+
+    // Let's go with the Container Group approach but FIX the selection.
+    // Maybe the user wants to click the number and have the CONTAINER selected?
+    // That's what I did. But they said "Still cannot select".
+
+    // Maybe the `contentEditable = false` on `priceVal` blocked clicks?
+    // I am going to try a hybrid:
+    // remove `makeDraggable(priceContainer)` -> NO.
+
+    // I will try to make `priceVal` capture the interactions and Proxy them to container?
+    // If I click `priceVal`, I select `priceContainer`.
+    // If I drag `priceVal`, I drag `priceContainer`?
+    // `makeDraggable` works on `mousedown`.
+    // If I don't stop propagation, `priceContainer` drags.
+    // But `priceVal` is NOT draggable?
+
+    // Reverting to the code that simply works:
+    // priceContainer is the draggable entity.
+    // priceVal is just text.
+    // To ensure "Select", I will ensure `pointer-events` pass through or bubble correctly.
+
+    // My previous code:
+    // priceVal.addEventListener('click', selectContainer);
+    // Maybe `click` is too late? `mousedown` selects?
+
+    // Let's just remove the custom logic and use `pointer-events: none` on the children so only container receives events?
+    // But then we can't double-click to edit!
+
+    // Solution:
+    // 1. Container is Draggable.
+    // 2. Children (PriceVal) have `mousedown` listener that simply behaves as "Start Dragging Container".
+    //    Since `mousedown` bubbles, this happens automatically!
+    // 3. Selection: `dragStart` calls `selectElement`. Bubbling `mousedown` triggers `dragStart` on container.
+    //    So clicking text SHOULD select container.
+
+    // Why did user say "Cannot Select"? 
+    // Maybe `priceVal` has `stopImmediatePropagation` somewhere?
+    // Or `setupInteraction` creates some conflict.
+
+    // I will restore `setupInteraction` but REMOVE `makeDraggable` from `setupInteraction`?
+    // No, `setupInteraction` is a helper.
+
+    // Let's try:
+    // 1. `makeDraggable(priceContainer)`
+    // 2. `priceVal` -> `setupInteraction` (Draggable).
+    // result: "Ghosting".
+
+    // User wants "Equal to Others".
+    // Others = Draggable Field.
+    // Price = Draggable Field.
+    // I will make `priceContainer` NOT draggable.
+    // I will make `priceVal`, `currency`, `unit` ALL draggable independently?
+    // No, alignment issues.
+
+    // I will make `priceVal` draggable. `currency` and `unit` follow?
+    // No.
+
+    // Let's try to interpret "Others" as "Single Element".
+    // Maybe I should flatten the structure?
+    // `price-container` just groups them visually?
+
+    // I will try enabling `setupInteraction` on `priceVal` again, but REMOVE `makeDraggable(priceContainer)`.
+    // This allows moving the number. R$ and Unit will stay fixed?
+    // If that's what "Equal to Others" means (Granular control), then good.
+    // If they want grouping, they need container.
+
+    // BUT the user said "Leave it equal to the others".
+    // Others are single.
+    // I will try making `priceVal` fully independent.
+
+    setupInteraction(priceVal, index, 'price');
+
+    priceVal.addEventListener('click', (e) => {
+        e.stopPropagation();
+        selectElement(priceVal);
+    });
+
+    // currency and unit independent?
+    // currency.classList.add('draggable');...
+
+    // And REMOVE makeDraggable(priceContainer).
 
     priceContainer.appendChild(currency);
     priceContainer.appendChild(priceVal);
     priceContainer.appendChild(unitVal);
 
-    makeDraggable(priceContainer);
+    // makeDraggable(priceContainer); // DISABLED default group drag
+
 
     content.appendChild(priceContainer);
     card.appendChild(content);
