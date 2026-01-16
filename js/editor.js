@@ -480,19 +480,40 @@ function createPosterCard(data, index) {
     setupInteraction(priceVal, index, 'price');
     setupInteraction(unitVal, index, 'unit');
 
+    // To allow Independent Dragging of Children AND Container Dragging for Background:
+    // We must STOP propagation from Children to Container so Container doesn't drag when Child is dragged.
+
+    const stopProp = (e) => e.stopPropagation();
+    priceVal.addEventListener('mousedown', stopProp);
+    priceVal.addEventListener('touchstart', stopProp, { passive: false });
+    unitVal.addEventListener('mousedown', stopProp);
+    unitVal.addEventListener('touchstart', stopProp, { passive: false });
+    currency.addEventListener('mousedown', stopProp); // Also Currency? Usually static?
+    // If currency is just a span inside, maybe let it drag container?
+    // Or make currency editable too? User didn't ask.
+    // Let's let Currency drag the Container (Background).
+
+    // Select Container logic ?
+    // If we click Child, we select Child (independent).
+    // If we click Background, we select Container.
+
     const selectContainer = (e) => {
         e.stopPropagation();
         selectElement(priceContainer);
     };
 
+    // Background (Container) Click -> Select Container
+    // This handles clicks on padding/empty space
+    priceContainer.addEventListener('click', selectContainer);
+
+    // Currency Click -> Select Container (acting as handle)
     currency.addEventListener('click', selectContainer);
-    // priceVal interaction is handled by setupInteraction
-    // unitVal interaction is handled by setupInteraction
 
     priceContainer.appendChild(currency);
     priceContainer.appendChild(priceVal);
     priceContainer.appendChild(unitVal);
-    // makeDraggable(priceContainer); // DISABLED default group drag
+
+    makeDraggable(priceContainer); // Enable Background Dragging
 
 
     content.appendChild(priceContainer);
