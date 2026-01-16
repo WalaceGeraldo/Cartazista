@@ -217,11 +217,40 @@ function initAuthListeners() {
 
 
 
-    // Sidebar Toggle
-    document.getElementById('sidebarToggle')?.addEventListener('click', (e) => {
+    // Sidebar Toggle & Responsive Icons
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const updateSidebarToggleIcon = () => {
+        if (!sidebarToggle) return;
+        const app = document.querySelector('.app-container');
+        const isMobile = window.innerWidth <= 768;
+        const isCollapsed = app.classList.contains('collapsed');
+
+        if (isMobile) {
+            // Mobile: Collapsed means visible (weird inverse logic in CSS), so if 'collapsed' is present, sidebar is SHOWN.
+            // Wait, let's check CSS again.
+            // .sidebar { margin-left: -80%; } (Hidden by default)
+            // .app-container.collapsed .sidebar { margin-left: 0; } (Shown)
+            // So: collapsed = SHOWN on mobile.
+            sidebarToggle.innerText = isCollapsed ? '✖' : '☰';
+        } else {
+            // Desktop: Collapsed means hidden.
+            // .sidebar { width: 320px; } (Shown by default)
+            // .app-container.collapsed .sidebar { margin-left: -320px; } (Hidden)
+            // So: collapsed = HIDDEN on desktop.
+            sidebarToggle.innerText = isCollapsed ? '▶' : '◀';
+        }
+    };
+
+    // Initial Icon
+    updateSidebarToggleIcon();
+
+    // Resize Listener
+    window.addEventListener('resize', updateSidebarToggleIcon);
+
+    sidebarToggle?.addEventListener('click', (e) => {
         const app = document.querySelector('.app-container');
         app.classList.toggle('collapsed');
-        e.target.innerText = app.classList.contains('collapsed') ? '▶' : '◀';
+        updateSidebarToggleIcon();
         setTimeout(updatePreviewScale, 305);
     });
 

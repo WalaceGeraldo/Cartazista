@@ -1764,11 +1764,15 @@ h2 {
         justify-content: center;
         position: fixed;
         right: 20px;
-        top: 20px;
+        top: 80px;
+        bottom: auto;
         width: 50px;
         height: 50px;
         border-radius: 50%;
-        background: var(--accent-color);
+        background: rgba(30, 30, 35, 0.9);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        color: white;
+        backdrop-filter: blur(5px);
         z-index: 100;
         font-size: 1.5rem;
     }
@@ -2996,25 +3000,28 @@ input:checked+.slider:before {
 /* Mobile Toolbar - Subtle/Glass */
 .mobile-toolbar {
     position: absolute;
-    background: rgba(40, 40, 40, 0.85);
-    /* Semi-transparent dark */
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border-radius: 20px;
-    /* Pillow shape */
-    padding: 6px 12px;
+    background: rgba(30, 30, 30, 0.8);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 50px;
+    /* More pill-shaped */
+    padding: 8px 16px;
     display: flex;
-    gap: 12px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    gap: 15px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1);
     z-index: 10000;
-    transition: opacity 0.2s, transform 0.2s;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     pointer-events: auto;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+
+    visibility: visible;
+    opacity: 1;
+    transform: translateY(0) scale(1);
 }
 
 .mobile-toolbar.hidden {
-    display: none;
+    visibility: hidden;
     opacity: 0;
+    transform: translateY(20px) scale(0.9);
     pointer-events: none;
 }
 
@@ -3022,17 +3029,21 @@ input:checked+.slider:before {
     background: transparent;
     color: rgba(255, 255, 255, 0.9);
     border: none;
-    padding: 6px;
-    border-radius: 50%;
-    font-size: 1.1rem;
+    padding: 6px 12px;
+    border-radius: 20px;
+    /* Pillow shape for text buttons too */
+    font-size: 0.9rem;
+    font-weight: 600;
     cursor: pointer;
     white-space: nowrap;
     display: flex;
     align-items: center;
     justify-content: center;
+    gap: 8px;
+    /* Gap for icon + text */
     transition: transform 0.2s, background 0.2s;
-    width: 36px;
     height: 36px;
+    /* Removed fixed width */
 }
 
 .toolbar-btn:hover {

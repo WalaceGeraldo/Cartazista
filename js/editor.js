@@ -265,39 +265,7 @@ function setupListeners() {
     document.getElementById('copyBtn')?.addEventListener('click', copyText);
     document.getElementById('pasteBtn')?.addEventListener('click', pasteText);
 
-    document.getElementById('mobileCopyBtn')?.addEventListener('click', () => {
-        copyText();
-        // Feedback
-        const btn = document.getElementById('mobileCopyBtn');
-        const original = btn.innerText;
-        btn.innerText = "OK!";
-        setTimeout(() => btn.innerText = original, 1000);
-    });
-    document.getElementById('mobilePasteBtn')?.addEventListener('click', pasteText);
 
-    // Mobile Toolbar Logic
-    window.addEventListener('cartazista:selection', (e) => {
-        const toolbar = document.getElementById('mobileToolbar');
-        const element = e.detail.element;
-
-        if (element && window.matchMedia("(max-width: 768px)").matches) {
-            toolbar.classList.remove('hidden');
-            updateToolbarPosition(toolbar, element);
-        } else {
-            toolbar.classList.add('hidden');
-        }
-    });
-
-    // Update position on drag/resize?
-    // We could listen to touchmove? Or just let it stay until next selection interaction?
-    // Ideally it follows.
-    document.addEventListener('touchmove', () => {
-        const toolbar = document.getElementById('mobileToolbar');
-        const el = getSelectedElement();
-        if (!toolbar.classList.contains('hidden') && el) {
-            updateToolbarPosition(toolbar, el);
-        }
-    });
 
     // Image Upload
     document.getElementById('bgUpload')?.addEventListener('change', (e) => {
@@ -577,19 +545,67 @@ export async function downloadPDF() {
     }
 }
 
-function updateToolbarPosition(toolbar, element) {
-    const rect = element.getBoundingClientRect();
-    const appRect = document.querySelector('.app-container').getBoundingClientRect(); // constrain to app
 
-    // Position above the element
-    let top = rect.top - 50;
-    let left = rect.left;
+async function copyImageToClipboard() {
+    const element = document.getElementById('printContainer');
+    if (!element) throw new Error("Elemento não encontrado");
 
-    // Contain within viewport
-    if (top < 10) top = rect.bottom + 10;
-    if (left < 10) left = 10;
-    if (left + toolbar.offsetWidth > window.innerWidth) left = window.innerWidth - toolbar.offsetWidth - 10;
+    // Capture current state to restore later
+    const originalTransform = element.style.transform;
+    const originalMargin = element.style.margin;
+    const originalBoxShadow = element.style.boxShadow;
 
-    toolbar.style.top = `${top}px`;
-    toolbar.style.left = `${left}px`;
+    // Reset styles for clean capture (render at natural size)
+    element.style.transform = 'none';
+    element.style.margin = '0';
+    element.style.boxShadow = 'none';
+
+    // Determine quality/scale based on layout
+    // Scale 2 is usually good for retina/high def
+    const opt = {
+        margin: 0,
+        filename: 'cartaz.png', // internal name
+        image: { type: 'png', quality: 1.0 },
+        html2canvas: {
+            scale: 2,
+            useCORS: true,
+            logging: false,
+            backgroundColor: null // Transparent if not specified, but poster has bg
+        },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
+    try {
+        // Generate Canvas
+        // We use html2pdf's worker chain to get the canvas easily
+        const worker = html2pdf().set(opt).from(element);
+        const canvas = await worker.toCanvas();
+
+        if (!canvas) throw new Error("Erro ao gerar a imagem do cartaz.");
+
+        // Convert to Blob
+        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+
+        if (!blob) throw new Error("Falha ao criar arquivo de imagem.");
+
+        // Write to Clipboard
+        if (navigator.clipboard && navigator.clipboard.write) {
+            await navigator.clipboard.write([
+                new ClipboardItem({
+                    [blob.type]: blob
+                })
+            ]);
+        } else {
+            throw new Error("Seu navegador ou contexto (inseguro?) não permite copiar imagens. Tente 'Baixar PDF'.");
+        }
+
+    } finally {
+        // Restore styling
+        element.style.transform = originalTransform;
+        element.style.margin = originalMargin;
+        element.style.boxShadow = originalBoxShadow;
+
+        // Force update preview scale just in case
+        updatePreviewScale();
+    }
 }
