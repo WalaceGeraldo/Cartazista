@@ -477,76 +477,22 @@ function createPosterCard(data, index) {
     // 1. Setup CHILDREN (Editable but NOT Draggable)
     // We manually implement 'setupInteraction' behavior for children, excluding makeDraggable.
 
-    const setupChild = (el, type) => {
-        el.contentEditable = false;
+    setupInteraction(priceVal, index, 'price');
+    setupInteraction(unitVal, index, 'unit');
 
-        // Click -> Select Container
-        el.addEventListener('click', (e) => {
-            e.stopPropagation();
-            selectElement(priceContainer);
-        });
-
-        // Double Click -> Edit Self
-        el.addEventListener('dblclick', (e) => {
-            e.stopPropagation();
-            el.contentEditable = true;
-            el.focus();
-            el.classList.add('editing');
-            // We do NOT selectElement(el) because that would show handles on the text.
-            // We want the group handles to remain? 
-            // Actually, if we are editing, we usually want selection on the item being edited?
-            // User said "Left it equal to others". Others selection is on the item.
-            // But if we select the item, we lose the container handles.
-            // Let's Keep Container Selected, but focus text.
-            selectElement(priceContainer);
-        });
-
-        // Blur -> Save
-        el.addEventListener('blur', () => {
-            el.contentEditable = false;
-            el.classList.remove('editing');
-            updateCard(index, type, el.innerText);
-        });
-
-        // Mobile Double Tap
-        let lastTap = 0;
-        el.addEventListener('touchend', (e) => {
-            if (el.contentEditable === 'true') return;
-            const currentTime = new Date().getTime();
-            const tapLength = currentTime - lastTap;
-            if (tapLength < 300 && tapLength > 0) {
-                e.preventDefault();
-                el.contentEditable = true;
-                el.focus();
-                el.classList.add('editing');
-            }
-            lastTap = currentTime;
-        });
-    };
-
-    setupChild(priceVal, 'price');
-    setupChild(unitVal, 'unit');
-
-    // 2. Setup CONTAINER (Draggable & Selectable)
-    // Click -> Select
     const selectContainer = (e) => {
         e.stopPropagation();
         selectElement(priceContainer);
     };
 
     currency.addEventListener('click', selectContainer);
-    priceVal.addEventListener('mousedown', (e) => {
-        // Stop accumulation? No, we WANT mousedown to bubble to container for Dragging!
-        // makeDraggable on container listens to mousedown.
-        // If child stops propagation, container won't drag.
-        // So we DO NOTHING here, let it bubble.
-    });
+    // priceVal interaction is handled by setupInteraction
+    // unitVal interaction is handled by setupInteraction
 
     priceContainer.appendChild(currency);
     priceContainer.appendChild(priceVal);
     priceContainer.appendChild(unitVal);
-
-    makeDraggable(priceContainer); // Enable Group Drag
+    // makeDraggable(priceContainer); // DISABLED default group drag
 
 
     content.appendChild(priceContainer);
