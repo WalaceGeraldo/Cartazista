@@ -472,82 +472,25 @@ function createPosterCard(data, index) {
     // remove `makeDraggable(priceContainer)` -> NO.
 
     // I will try to make `priceVal` capture the interactions and Proxy them to container?
-    // If I click `priceVal`, I select `priceContainer`.
-    // If I drag `priceVal`, I drag `priceContainer`?
-    // `makeDraggable` works on `mousedown`.
-    // If I don't stop propagation, `priceContainer` drags.
-    // But `priceVal` is NOT draggable?
 
-    // Reverting to the code that simply works:
-    // priceContainer is the draggable entity.
-    // priceVal is just text.
-    // To ensure "Select", I will ensure `pointer-events` pass through or bubble correctly.
+    // Check if we need to trim the initial space for editing? 
+    // Usually fine, user can delete it.
+    // Making unit interactive just like other fields.
+    setupInteraction(unitVal, index, 'unit');
 
-    // My previous code:
-    // priceVal.addEventListener('click', selectContainer);
-    // Maybe `click` is too late? `mousedown` selects?
-
-    // Let's just remove the custom logic and use `pointer-events: none` on the children so only container receives events?
-    // But then we can't double-click to edit!
-
-    // Solution:
-    // 1. Container is Draggable.
-    // 2. Children (PriceVal) have `mousedown` listener that simply behaves as "Start Dragging Container".
-    //    Since `mousedown` bubbles, this happens automatically!
-    // 3. Selection: `dragStart` calls `selectElement`. Bubbling `mousedown` triggers `dragStart` on container.
-    //    So clicking text SHOULD select container.
-
-    // Why did user say "Cannot Select"? 
-    // Maybe `priceVal` has `stopImmediatePropagation` somewhere?
-    // Or `setupInteraction` creates some conflict.
-
-    // I will restore `setupInteraction` but REMOVE `makeDraggable` from `setupInteraction`?
-    // No, `setupInteraction` is a helper.
-
-    // Let's try:
-    // 1. `makeDraggable(priceContainer)`
-    // 2. `priceVal` -> `setupInteraction` (Draggable).
-    // result: "Ghosting".
-
-    // User wants "Equal to Others".
-    // Others = Draggable Field.
-    // Price = Draggable Field.
-    // I will make `priceContainer` NOT draggable.
-    // I will make `priceVal`, `currency`, `unit` ALL draggable independently?
-    // No, alignment issues.
-
-    // I will make `priceVal` draggable. `currency` and `unit` follow?
-    // No.
-
-    // Let's try to interpret "Others" as "Single Element".
-    // Maybe I should flatten the structure?
-    // `price-container` just groups them visually?
-
-    // I will try enabling `setupInteraction` on `priceVal` again, but REMOVE `makeDraggable(priceContainer)`.
-    // This allows moving the number. R$ and Unit will stay fixed?
-    // If that's what "Equal to Others" means (Granular control), then good.
-    // If they want grouping, they need container.
-
-    // BUT the user said "Leave it equal to the others".
-    // Others are single.
-    // I will try making `priceVal` fully independent.
-
-    setupInteraction(priceVal, index, 'price');
-
-    priceVal.addEventListener('click', (e) => {
+    // Independent interaction listeners
+    const selectContainer = (e) => {
         e.stopPropagation();
-        selectElement(priceVal);
-    });
+        selectElement(priceContainer);
+    };
 
-    // currency and unit independent?
-    // currency.classList.add('draggable');...
-
-    // And REMOVE makeDraggable(priceContainer).
+    currency.addEventListener('click', selectContainer);
+    // priceVal interaction is handled by setupInteraction
+    // unitVal interaction is handled by setupInteraction
 
     priceContainer.appendChild(currency);
     priceContainer.appendChild(priceVal);
     priceContainer.appendChild(unitVal);
-
     // makeDraggable(priceContainer); // DISABLED default group drag
 
 
