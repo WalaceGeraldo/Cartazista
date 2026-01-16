@@ -878,11 +878,18 @@ select:focus {
 }
 
 /* Fix dropdown option visibility */
-select option {
+select option,
+select optgroup {
     background-color: #1c1c1e;
-    /* Dark background */
     color: white;
-    /* White text */
+    font-weight: normal;
+}
+
+select optgroup {
+    font-weight: bold;
+    color: var(--secondary-text);
+    font-style: normal;
+    background-color: #1c1c1e;
 }
 
 .price-row {
