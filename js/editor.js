@@ -429,7 +429,51 @@ function createPosterCard(data, index) {
     priceVal.className = 'price-value';
     priceVal.innerText = data.price;
 
-    setupInteraction(priceVal, index, 'price');
+    // Custom setup for priceVal:
+    // 1. Should NOT be draggable itself (container manages dragging)
+    // 2. Click should select container
+    // 3. Double-click should still allow text editing
+
+    // We replicate setupInteraction but skip makeDraggable and force container selection
+    priceVal.contentEditable = false;
+
+    // Click logic moved to container listeners below
+
+    // Edit Logic
+    priceVal.addEventListener('dblclick', (e) => {
+        e.stopPropagation();
+        priceVal.contentEditable = true;
+        priceVal.focus();
+        priceVal.classList.add('editing');
+        // Do NOT selectElement(priceVal), keep container selected?
+        // Or temporarily select priceVal for editing context?
+        // If we select priceVal, the handles might look weird or be on just the number.
+        // Let's keep selecting the container if possible, but editing needs focus.
+        // If we selectElement(priceVal), it breaks "group layout".
+        // Let's try NOT changing selection, just focus.
+        // selectElement(priceContainer); // Ensure container stays selected
+    });
+
+    // Mobile Double Tap
+    let lastTap = 0;
+    priceVal.addEventListener('touchend', (e) => {
+        if (priceVal.contentEditable === 'true') return;
+        const currentTime = new Date().getTime();
+        const tapLength = currentTime - lastTap;
+        if (tapLength < 300 && tapLength > 0) {
+            e.preventDefault();
+            priceVal.contentEditable = true;
+            priceVal.focus();
+            priceVal.classList.add('editing');
+        }
+        lastTap = currentTime;
+    });
+
+    priceVal.addEventListener('blur', () => {
+        priceVal.contentEditable = false;
+        priceVal.classList.remove('editing');
+        updateCard(index, 'price', priceVal.innerText);
+    });
 
     const unitVal = document.createElement('span');
     unitVal.className = 'unit-value';
